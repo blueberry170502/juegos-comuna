@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
 import { FirebaseProvider } from "@/lib/firebase-provider";
+import DebugHelper from "@/lib/debug-helper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
             <div className="min-h-screen flex flex-col">
               <Navbar />
               <div className="flex-1">{children}</div>
+              <DebugHelper />
             </div>
           </FirebaseProvider>
         </ThemeProvider>

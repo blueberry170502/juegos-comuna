@@ -41,15 +41,26 @@ export function useAuth() {
       return
     }
 
+    // Asegúrate de que estamos usando la ruta correcta para el documento del usuario
     const userRef = doc(db, "users", user.uid)
-    const unsubscribe = onSnapshot(userRef, (doc) => {
-      if (doc.exists()) {
-        setUserData(doc.data() as UserData)
-      } else {
-        setUserData(null)
-      }
-      setLoading(false)
-    })
+
+    const unsubscribe = onSnapshot(
+      userRef,
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          console.log("User data found:", docSnapshot.data())
+          setUserData(docSnapshot.data() as UserData)
+        } else {
+          console.log("No user data found for:", user.uid)
+          setUserData(null)
+        }
+        setLoading(false)
+      },
+      (error) => {
+        console.error("Error fetching user data:", error)
+        setLoading(false)
+      },
+    )
 
     return () => unsubscribe()
   }, [user])
@@ -62,11 +73,11 @@ export function useAuth() {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password)
     const user = userCredential.user
 
-    // Create user document in Firestore
+    // Create user document in Firestore with initial data
     await setDoc(doc(db, "users", user.uid), {
       username,
       email,
-      balance: 0,
+      balance: 100, // Dar un saldo inicial
       isAdmin: false,
       createdAt: serverTimestamp(),
       purchases: [],
