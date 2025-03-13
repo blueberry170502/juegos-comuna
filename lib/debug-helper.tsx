@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/lib/firebase-hooks";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase-config";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/lib/firebase-hooks"
+import { doc, setDoc } from "firebase/firestore"
+import { db } from "@/lib/firebase-config"
+import { useToast } from "@/hooks/use-toast"
 
 export default function DebugHelper() {
-  const { user, userData } = useAuth();
-  const { toast } = useToast();
-  const [isOpen, setIsOpen] = useState(false);
+  const { user, userData } = useAuth()
+  const { toast } = useToast()
+  const [isOpen, setIsOpen] = useState(false)
 
   const resetUserData = async () => {
     if (!user) {
@@ -19,8 +19,8 @@ export default function DebugHelper() {
         title: "Error",
         description: "No hay usuario autenticado",
         variant: "destructive",
-      });
-      return;
+      })
+      return
     }
 
     try {
@@ -33,24 +33,23 @@ export default function DebugHelper() {
         createdAt: new Date(),
         purchases: [],
         challenges: [],
-      });
+      })
 
       toast({
         title: "Datos restablecidos",
-        description:
-          "Los datos del usuario han sido restablecidos correctamente",
-      });
+        description: "Los datos del usuario han sido restablecidos correctamente",
+      })
     } catch (error) {
-      console.error("Error al restablecer datos:", error);
+      console.error("Error al restablecer datos:", error)
       toast({
         title: "Error",
         description: "No se pudieron restablecer los datos",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
-  if (!user) return null;
+  if (!user) return null
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -59,11 +58,7 @@ export default function DebugHelper() {
           <CardHeader>
             <CardTitle className="text-lg flex justify-between">
               Herramientas de depuración
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsOpen(false)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
                 X
               </Button>
             </CardTitle>
@@ -72,16 +67,9 @@ export default function DebugHelper() {
             <div>
               <p className="text-sm mb-2">ID de usuario: {user.uid}</p>
               <p className="text-sm mb-2">Email: {user.email}</p>
-              <p className="text-sm mb-2">
-                Datos cargados: {userData ? "Sí" : "No"}
-              </p>
+              <p className="text-sm mb-2">Datos cargados: {userData ? "Sí" : "No"}</p>
             </div>
-            <Button
-              onClick={resetUserData}
-              variant="destructive"
-              size="sm"
-              className="w-full"
-            >
+            <Button onClick={resetUserData} variant="destructive" size="sm" className="w-full">
               Restablecer datos de usuario
             </Button>
           </CardContent>
@@ -92,5 +80,6 @@ export default function DebugHelper() {
         </Button>
       )}
     </div>
-  );
+  )
 }
+

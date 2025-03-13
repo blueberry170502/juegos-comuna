@@ -1,16 +1,16 @@
 import { Suspense } from "react"
 import AuthCheck from "@/components/auth-check"
-import UserProfile from "@/components/user-profile"
+import BlackjackBetting from "@/components/games/blackjack-betting"
 import LoadingSpinner from "@/components/loading-spinner"
 
-export default function ProfilePage() {
+export default function BlackjackPage() {
   return (
     <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
+      <h1 className="text-3xl font-bold mb-8">Blackjack</h1>
 
       <AuthCheck>
         <Suspense fallback={<LoadingSpinner />}>
-          <UserProfile />
+          <BlackjackBetting />
         </Suspense>
       </AuthCheck>
     </main>
