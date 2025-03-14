@@ -212,6 +212,7 @@ export default function SlotMachineBetting() {
       if (i < linesPlayed) {
         const multiplier = checkWinningLine(symbols, PAYLINES[i]);
         if (multiplier > 0) {
+          // Calcular ganancias: apuesta por línea * multiplicador
           totalWin += betPerLine * multiplier;
           winLines.push(i);
         }
@@ -330,7 +331,8 @@ export default function SlotMachineBetting() {
         // Si hay ganancias, actualizar saldo
         if (totalWin > 0) {
           await updateDoc(userRef, {
-            balance: userData.balance - totalBet + totalWin,
+            // Devolver la apuesta original + las ganancias
+            balance: userData.balance + totalWin,
           });
 
           toast({
@@ -358,7 +360,11 @@ export default function SlotMachineBetting() {
         // Si autoPlay está activado, programar el siguiente giro
         if (autoPlayRef.current) {
           // Calcular el nuevo saldo después de esta ronda
-          const newBalance = userData.balance - totalBet + totalWin;
+          // Si hay ganancias, se suma al saldo (ya incluye la apuesta original)
+          const newBalance =
+            totalWin > 0
+              ? userData.balance + totalWin
+              : userData.balance - totalBet;
 
           // Solo programar el siguiente giro si hay suficiente saldo
           if (newBalance >= totalBet) {
