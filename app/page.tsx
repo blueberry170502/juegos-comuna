@@ -76,6 +76,13 @@ export default function HomePage() {
               href="/games/horse-racing"
               totalBets={0}
             />
+            <GameEmbed
+              title="Slots"
+              description="Spin the reels and try your luck"
+              image="/placeholder.svg?height=400&width=400"
+              href="/games/slots"
+              totalBets={0}
+            />
           </div>
         </Suspense>
       </AuthCheck>
