@@ -266,7 +266,10 @@ export default function Navbar() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => signOut()}
+                        onClick={() => {
+                          signOut();
+                          window.location.href = "/";
+                        }}
                         className="flex items-center justify-start px-3"
                       >
                         <LogOut className="h-4 w-4 mr-2" />

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useFirebaseContext } from "./firebase-provider"
 import { auth, db } from "./firebase-config"
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as authSignOut } from "firebase/auth"
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as authSignOut, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore"
 
 interface UserData {
@@ -82,9 +82,17 @@ export function useAuth() {
       createdAt: serverTimestamp(),
       purchases: [],
       challenges: [],
+      
     })
 
     return userCredential
+  }
+
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider()
+    const userCredential = await signInWithPopup(auth, provider)
+    console.log("User signed in with Google, ID:", userCredential.user.uid)
+    return userCredential.user
   }
 
   const signOut = async () => {
@@ -97,6 +105,7 @@ export function useAuth() {
     loading: authLoading || loading,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
   }
 }
