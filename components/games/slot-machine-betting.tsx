@@ -8,10 +8,12 @@ import {
   updateDoc,
   collection,
   addDoc,
+  deleteDoc,
   serverTimestamp,
   getDocs,
   query,
   where,
+  orderBy,
 } from "firebase/firestore";
 import {
   Card,
@@ -328,6 +330,21 @@ export default function SlotMachineBetting() {
           winAmount: totalWin,
         });
 
+        // Verificar si hay más de 5 apuestas y eliminar la más antigua
+        const betsRef = collection(db, "bets");
+        const q = query(
+          betsRef,
+          where("game", "==", "slots"),
+          where("userId", "==", user.uid),
+          orderBy("timestamp", "asc")
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.size > 5) {
+          const oldestBet = querySnapshot.docs[0];
+          await deleteDoc(oldestBet.ref);
+        }
+
         // Si hay ganancias, actualizar saldo
         if (totalWin > 0) {
           await updateDoc(userRef, {
@@ -354,7 +371,13 @@ export default function SlotMachineBetting() {
           winAmount: totalWin,
         };
 
-        setUserBets([newBet, ...userBets]);
+        setUserBets((prevBets) => {
+          const updatedBets = [newBet, ...prevBets];
+          if (updatedBets.length > 5) {
+            updatedBets.pop(); // Elimina la apuesta más antigua (última en la lista)
+          }
+          return updatedBets;
+        });
         setSpinning(false);
 
         // Si autoPlay está activado, programar el siguiente giro
