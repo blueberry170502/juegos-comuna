@@ -194,6 +194,7 @@ export default function StoreItems() {
           status: "pending",
           isReceived: false,
           createdAt: new Date(),
+          value: selectedItem.price,
         }),
       });
 
@@ -207,6 +208,7 @@ export default function StoreItems() {
           status: "pending",
           isReceived: true,
           createdAt: new Date(),
+          value: selectedItem.price,
         }),
       });
 
