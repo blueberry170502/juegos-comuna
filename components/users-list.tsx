@@ -57,6 +57,8 @@ export default function UsersList() {
     Record<string, Challenge[]>
   >({});
   const { toast } = useToast();
+  const { userData } = useAuth();
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -419,6 +421,56 @@ export default function UsersList() {
             collection.
           </p>
         </div>
+      </div>
+    );
+  }
+
+  // TODO: HACER QUE SE PUEDA VER EL RANKING DE CHALLENGES HECHOS
+  if (userData?.isAdmin === false) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Users ({users.length})</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.location.reload()}
+          >
+            Refresh
+          </Button>
+        </div>
+
+        {users
+          .sort((a, b) => b.balance - a.balance)
+          .map((user, i) => (
+            <Card key={user.id} className="mb-4">
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  <span>
+                    {i === 0 && "🥇 "}
+                    {i === 1 && "🥈 "}
+                    {i === 2 && "🥉 "}
+                    {user.username}
+                  </span>
+                  <span className="text-primary">
+                    {balances[user.id]} coins
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-4">Challenges done:</p>
+                <p>
+                  🏆{" "}
+                  {user.challenges
+                    ? user.challenges.filter(
+                        (challenge) => challenge.status === "completed"
+                      ).length
+                    : 0}{" "}
+                  challenges
+                </p>
+              </CardContent>
+            </Card>
+          ))}
       </div>
     );
   }

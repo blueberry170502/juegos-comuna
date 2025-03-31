@@ -8,15 +8,15 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import LoadingSpinner from "@/components/loading-spinner";
+
+// TODO: HACER QUE SOLO SE MUESTREN LOS RETOS RECIBIDOS
 
 export default function ChallengesList() {
   const { userData, user, loading } = useAuth();
