@@ -25,7 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Minus, XCircle, CheckCircle } from "lucide-react";
 import LoadingSpinner from "@/components/loading-spinner";
 import { useAuth } from "@/lib/firebase-hooks";
-import { set, setQuarter } from "date-fns";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface User {
   id: string;
@@ -425,7 +425,6 @@ export default function UsersList() {
     );
   }
 
-  // TODO: HACER QUE SE PUEDA VER EL RANKING DE CHALLENGES HECHOS
   if (userData?.isAdmin === false) {
     return (
       <div className="space-y-6">
@@ -439,38 +438,89 @@ export default function UsersList() {
             Refresh
           </Button>
         </div>
-
-        {users
-          .sort((a, b) => b.balance - a.balance)
-          .map((user, i) => (
-            <Card key={user.id} className="mb-4">
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <span>
-                    {i === 0 && "🥇 "}
-                    {i === 1 && "🥈 "}
-                    {i === 2 && "🥉 "}
-                    {user.username}
-                  </span>
-                  <span className="text-primary">
-                    {balances[user.id]} coins
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">Challenges done:</p>
-                <p>
-                  🏆{" "}
-                  {user.challenges
-                    ? user.challenges.filter(
-                        (challenge) => challenge.status === "completed"
-                      ).length
-                    : 0}{" "}
-                  challenges
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+        <Tabs defaultValue="money">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="money">Dinero</TabsTrigger>
+            <TabsTrigger value="challenges">Challenges</TabsTrigger>
+          </TabsList>
+          <TabsContent value="money" className="mt-4">
+            {users
+              .sort((a, b) => b.balance - a.balance)
+              .map((user, i) => (
+                <Card key={user.id} className="mb-4">
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>
+                        {i === 0 && "🥇 "}
+                        {i === 1 && "🥈 "}
+                        {i === 2 && "🥉 "}
+                        {user.username}
+                      </span>
+                      <span className="text-primary">
+                        {balances[user.id]} 🪙
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="mb-4">
+                      Challenges hechos:{" "}
+                      {user.challenges
+                        ? user.challenges.filter(
+                            (challenge) =>
+                              challenge.status === "completed" &&
+                              challenge.isReceived === true
+                          ).length
+                        : 0}{" "}
+                      🏆
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+          </TabsContent>
+          <TabsContent value="challenges" className="mt-4">
+            {users
+              .sort(
+                (a, b) =>
+                  usersChallenges[b.id].filter(
+                    (challenge) =>
+                      challenge.status === "completed" &&
+                      challenge.isReceived === true
+                  ).length -
+                  usersChallenges[a.id].filter(
+                    (challenge) =>
+                      challenge.status === "completed" &&
+                      challenge.isReceived === true
+                  ).length
+              )
+              .map((user, i) => (
+                <Card key={user.id} className="mb-4">
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>
+                        {i === 0 && "🥇 "}
+                        {i === 1 && "🥈 "}
+                        {i === 2 && "🥉 "}
+                        {user.username}
+                      </span>
+                      <span className="text-primary">
+                        {
+                          usersChallenges[user.id].filter(
+                            (challenge) =>
+                              challenge.status === "completed" &&
+                              challenge.isReceived === true
+                          ).length
+                        }{" "}
+                        challenges
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="mb-4">Dinero total: {balances[user.id]} 🪙</p>
+                  </CardContent>
+                </Card>
+              ))}
+          </TabsContent>
+        </Tabs>
       </div>
     );
   }
