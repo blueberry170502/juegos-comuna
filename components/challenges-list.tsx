@@ -15,6 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Clock } from "lucide-react";
 import LoadingSpinner from "@/components/loading-spinner";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // TODO: HACER QUE SOLO SE MUESTREN LOS RETOS RECIBIDOS
 
@@ -22,6 +30,7 @@ export default function ChallengesList() {
   const { userData, user, loading } = useAuth();
   const { toast } = useToast();
   const [timeLeft, setTimeLeft] = useState<Record<string, string>>({});
+  const [selectedFilter, setSelectedFilter] = useState<string>("Recieved");
 
   useEffect(() => {
     if (!userData?.challenges) return;
@@ -34,9 +43,20 @@ export default function ChallengesList() {
     const timers: Record<string, NodeJS.Timeout> = {};
 
     pendingChallenges.forEach((challenge) => {
-      // For this example, we'll use a simple countdown
-      // In a real app, you'd calculate based on the challenge creation time
-      let secondsLeft = 300; // 5 minutes
+      if (!challenge.createdAt) return;
+
+      // Calcular el tiempo restante en segundos
+      const createdAt = challenge.createdAt.seconds * 1000; // Convertir a milisegundos
+      const now = Date.now();
+      const timeElapsed = Math.floor((now - createdAt) / 1000); // Tiempo transcurrido en segundos
+      const totalDuration = 300; // 5 minutos en segundos
+      let secondsLeft = totalDuration - timeElapsed;
+
+      if (secondsLeft <= 0) {
+        // Si el tiempo ya ha expirado, manejar el fallo del desafío
+        handleFailChallenge(challenge.challengeId);
+        return;
+      }
 
       const updateTime = () => {
         const minutes = Math.floor(secondsLeft / 60);
@@ -193,14 +213,53 @@ export default function ChallengesList() {
   }
 
   const pendingChallenges =
-    userData.challenges?.filter((c) => c.status === "pending") || [];
+    userData.challenges?.filter((c) => {
+      if (selectedFilter === "Recieved") {
+        return c.status === "pending" && c.isReceived === true;
+      } else if (selectedFilter === "Sent") {
+        return c.status === "pending" && c.isReceived === false;
+      }
+      return false;
+    }) || [];
+
   const completedChallenges =
-    userData.challenges?.filter((c) => c.status === "completed") || [];
+    userData.challenges?.filter((c) => {
+      if (selectedFilter === "Recieved") {
+        return c.status === "completed" && c.isReceived === true;
+      } else if (selectedFilter === "Sent") {
+        return c.status === "completed" && c.isReceived === false;
+      }
+      return false;
+    }) || [];
+
   const failedChallenges =
-    userData.challenges?.filter((c) => c.status === "failed") || [];
+    userData.challenges?.filter((c) => {
+      if (selectedFilter === "Recieved") {
+        return c.status === "failed" && c.isReceived === true;
+      } else if (selectedFilter === "Sent") {
+        return c.status === "failed" && c.isReceived === false;
+      }
+      return false;
+    }) || [];
 
   return (
     <div className="space-y-8">
+      <div className="space-y-2">
+        <Label htmlFor="Filter by">Filtrar por:</Label>
+        <Select value={selectedFilter} onValueChange={setSelectedFilter}>
+          <SelectTrigger>
+            <SelectValue defaultValue="Recieved" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem key="Recieved" value="Recieved">
+              Recieved
+            </SelectItem>
+            <SelectItem key="Sent" value="Sent">
+              Sent
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div>
         <h2 className="text-xl font-semibold mb-4">Pending Challenges</h2>
         {pendingChallenges.length > 0 ? (

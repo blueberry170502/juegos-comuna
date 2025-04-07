@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useFirebaseContext } from "./firebase-provider"
 import { auth, db } from "./firebase-config"
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as authSignOut, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
-import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore"
+import { doc, setDoc, onSnapshot, serverTimestamp, Timestamp } from "firebase/firestore"
 
 interface UserData {
   username: string
@@ -23,6 +23,7 @@ interface UserData {
     challengeName: string
     otherUserId: string
     otherUsername: string
+    createdAt: Timestamp
     status: "pending" | "completed" | "failed"
     isReceived: boolean
     timeRemaining?: string
