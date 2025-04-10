@@ -7,7 +7,7 @@ import LoadingSpinner from "@/components/loading-spinner";
 export default function UsersPage() {
   return (
     <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Users List</h1>
+      <h1 className="text-3xl font-bold mb-8">Lista de Usuarios</h1>
 
       <AuthCheck>
         <Suspense fallback={<LoadingSpinner />}>
