@@ -248,20 +248,20 @@ export default function ChallengesList() {
         <Label htmlFor="Filter by">Filtrar por:</Label>
         <Select value={selectedFilter} onValueChange={setSelectedFilter}>
           <SelectTrigger>
-            <SelectValue defaultValue="Recieved" />
+            <SelectValue defaultValue="Recibidos" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem key="Recieved" value="Recieved">
-              Recieved
+              Recibidos
             </SelectItem>
             <SelectItem key="Sent" value="Sent">
-              Sent
+              Enviados
             </SelectItem>
           </SelectContent>
         </Select>
       </div>
       <div>
-        <h2 className="text-xl font-semibold mb-4">Pending Challenges</h2>
+        <h2 className="text-xl font-semibold mb-4">Desafíos Pendientes</h2>
         {pendingChallenges.length > 0 ? (
           <div className="space-y-4">
             {pendingChallenges.map((challenge) => (
@@ -273,11 +273,11 @@ export default function ChallengesList() {
                       variant="outline"
                       className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
                     >
-                      Pending
+                      Pendiente
                     </Badge>
                   </div>
                   <CardDescription>
-                    {challenge.isReceived ? "From" : "To"}:{" "}
+                    {challenge.isReceived ? "De" : "Para"}:{" "}
                     {challenge.otherUsername}
                   </CardDescription>
                 </CardHeader>
@@ -286,7 +286,7 @@ export default function ChallengesList() {
                     <div className="flex items-center text-yellow-500">
                       <Clock className="h-4 w-4 mr-2" />
                       <span>
-                        Time remaining:{" "}
+                        Tiempo restante:{" "}
                         {timeLeft[challenge.challengeId] || "5:00"}
                       </span>
                     </div>
@@ -296,12 +296,12 @@ export default function ChallengesList() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No pending challenges</p>
+          <p className="text-muted-foreground">No hay desafíos pendientes</p>
         )}
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Completed Challenges</h2>
+        <h2 className="text-xl font-semibold mb-4">Desafíos Completados</h2>
         {completedChallenges.length > 0 ? (
           <div className="space-y-4">
             {completedChallenges.map((challenge) => (
@@ -313,11 +313,11 @@ export default function ChallengesList() {
                       variant="outline"
                       className="bg-green-500/10 text-green-500 border-green-500/20"
                     >
-                      Completed
+                      Completado
                     </Badge>
                   </div>
                   <CardDescription>
-                    {challenge.isReceived ? "From" : "To"}:{" "}
+                    {challenge.isReceived ? "De" : "Para"}:{" "}
                     {challenge.otherUsername}
                   </CardDescription>
                 </CardHeader>
@@ -325,12 +325,12 @@ export default function ChallengesList() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No completed challenges</p>
+          <p className="text-muted-foreground">No hay desafíos completados</p>
         )}
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Failed Challenges</h2>
+        <h2 className="text-xl font-semibold mb-4">Desafíos Fallidos</h2>
         {failedChallenges.length > 0 ? (
           <div className="space-y-4">
             {failedChallenges.map((challenge) => (
@@ -342,11 +342,11 @@ export default function ChallengesList() {
                       variant="outline"
                       className="bg-red-500/10 text-red-500 border-red-500/20"
                     >
-                      Failed
+                      Fallido
                     </Badge>
                   </div>
                   <CardDescription>
-                    {challenge.isReceived ? "From" : "To"}:{" "}
+                    {challenge.isReceived ? "De" : "Para"}:{" "}
                     {challenge.otherUsername}
                   </CardDescription>
                 </CardHeader>
@@ -354,7 +354,7 @@ export default function ChallengesList() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No failed challenges</p>
+          <p className="text-muted-foreground">No hay desafíos fallidos</p>
         )}
       </div>
     </div>

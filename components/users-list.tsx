@@ -47,353 +47,354 @@ interface Challenge {
   value: number;
 }
 
-export default function UsersList() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function ListaDeUsuarios() {
+  const [usuarios, setUsuarios] = useState<User[]>([]);
+  const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [amounts, setAmounts] = useState<Record<string, number>>({});
-  const [balances, setBalances] = useState<Record<string, number>>({});
-  const [usersChallenges, setUsersChallenges] = useState<
+  const [cantidades, setCantidades] = useState<Record<string, number>>({});
+  const [saldos, setSaldos] = useState<Record<string, number>>({});
+  const [retosDeUsuarios, setRetosDeUsuarios] = useState<
     Record<string, Challenge[]>
   >({});
   const { toast } = useToast();
   const { userData } = useAuth();
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const obtenerUsuarios = async () => {
       try {
-        console.log("Fetching users...");
-        setLoading(true);
+        console.log("Obteniendo usuarios...");
+        setCargando(true);
         setError(null);
 
-        const usersCollection = collection(db, "users");
-        const usersQuery = query(usersCollection, limit(50)); // Limitar a 50 usuarios para evitar problemas de rendimiento
-        const usersSnapshot = await getDocs(usersQuery);
+        const coleccionUsuarios = collection(db, "users");
+        const consultaUsuarios = query(coleccionUsuarios, limit(50)); // Limitar a 50 usuarios para evitar problemas de rendimiento
+        const snapshotUsuarios = await getDocs(consultaUsuarios);
 
-        if (usersSnapshot.empty) {
-          console.log("No users found");
-          setUsers([]);
-          setLoading(false);
+        if (snapshotUsuarios.empty) {
+          console.log("No se encontraron usuarios");
+          setUsuarios([]);
+          setCargando(false);
           return;
         }
 
-        console.log(`Found ${usersSnapshot.docs.length} users`);
+        console.log(`Se encontraron ${snapshotUsuarios.docs.length} usuarios`);
 
-        const usersList = usersSnapshot.docs.map((doc) => {
+        const listaUsuarios = snapshotUsuarios.docs.map((doc) => {
           const data = doc.data();
           return {
             id: doc.id,
-            username: data.username || "Unknown",
-            email: data.email || "No email",
+            username: data.username || "Desconocido",
+            email: data.email || "Sin correo",
             balance: data.balance || 0,
             isAdmin: data.isAdmin || false,
             challenges: data.challenges || [],
           };
         });
 
-        setBalances(
-          usersList.reduce((acc, user) => {
-            acc[user.id] = user.balance;
+        setSaldos(
+          listaUsuarios.reduce((acc, usuario) => {
+            acc[usuario.id] = usuario.balance;
             return acc;
           }, {} as Record<string, number>)
         );
 
-        setUsers(usersList);
-        setUsersChallenges(
-          usersList.reduce((acc, user) => {
-            acc[user.id] = user.challenges;
+        setUsuarios(listaUsuarios);
+        setRetosDeUsuarios(
+          listaUsuarios.reduce((acc, usuario) => {
+            acc[usuario.id] = usuario.challenges;
             return acc;
           }, {} as Record<string, Challenge[]>)
         );
 
-        // Initialize amounts object
-        const initialAmounts: Record<string, number> = {};
-        usersList.forEach((user) => {
-          initialAmounts[user.id] = 0;
+        // Inicializar objeto de cantidades
+        const cantidadesIniciales: Record<string, number> = {};
+        listaUsuarios.forEach((usuario) => {
+          cantidadesIniciales[usuario.id] = 0;
         });
-        setAmounts(initialAmounts);
+        setCantidades(cantidadesIniciales);
       } catch (error) {
-        console.error("Error fetching users:", error);
-        setError("Failed to load users. Please try again later.");
+        console.error("Error al obtener usuarios:", error);
+        setError(
+          "No se pudieron cargar los usuarios. Por favor, inténtalo de nuevo más tarde."
+        );
       } finally {
-        setLoading(false);
+        setCargando(false);
       }
     };
 
-    fetchUsers();
+    obtenerUsuarios();
   }, []);
 
-  const handleCompleteChallenge = async (
-    challengeId: string,
-    userId: string
-  ) => {
-    console.log("Completing challenge:", challengeId, "for user:", userId);
+  const manejarCompletarReto = async (idReto: string, idUsuario: string) => {
+    console.log("Completando reto:", idReto, "para el usuario:", idUsuario);
     try {
-      const userRef = doc(db, "users", userId);
+      const referenciaUsuario = doc(db, "users", idUsuario);
 
-      const user = users.find((u) => u.id === userId);
-      if (!user) return;
-      console.log("User found:", user);
+      const usuario = usuarios.find((u) => u.id === idUsuario);
+      if (!usuario) return;
+      console.log("Usuario encontrado:", usuario);
 
-      const challenge = user.challenges?.find(
-        (c) => c.challengeId === challengeId
-      );
-      if (!challenge) return;
-      console.log("Challenge found:", challenge);
+      const reto = usuario.challenges?.find((c) => c.challengeId === idReto);
+      if (!reto) return;
+      console.log("Reto encontrado:", reto);
 
-      setUsersChallenges((prev) => ({
+      setRetosDeUsuarios((prev) => ({
         ...prev,
-        [userId]: prev[userId].filter((c) => c.challengeId !== challengeId),
+        [idUsuario]: prev[idUsuario].filter((c) => c.challengeId !== idReto),
       }));
 
-      // Remove the pending challenge
-      await updateDoc(userRef, {
-        challenges: arrayRemove(challenge),
+      // Eliminar el reto pendiente
+      await updateDoc(referenciaUsuario, {
+        challenges: arrayRemove(reto),
       });
 
-      // Add the completed challenge
-      await updateDoc(userRef, {
+      // Agregar el reto completado
+      await updateDoc(referenciaUsuario, {
         challenges: arrayUnion({
-          ...challenge,
+          ...reto,
           status: "completed",
         }),
       });
 
-      // Update the other user's challenge too
-      const otherUserRef = doc(db, "users", challenge.otherUserId);
-      const otherChallenge = {
-        challengeId: challenge.challengeId,
-        challengeName: challenge.challengeName,
-        otherUserId: userId,
-        otherUsername: user.username,
+      // Actualizar el reto del otro usuario también
+      const referenciaOtroUsuario = doc(db, "users", reto.otherUserId);
+      const otroReto = {
+        challengeId: reto.challengeId,
+        challengeName: reto.challengeName,
+        otherUserId: idUsuario,
+        otherUsername: usuario.username,
         status: "pending",
         isReceived: false,
       };
 
-      await updateDoc(otherUserRef, {
-        challenges: arrayRemove(otherChallenge),
+      await updateDoc(referenciaOtroUsuario, {
+        challenges: arrayRemove(otroReto),
       });
 
-      await updateDoc(otherUserRef, {
+      await updateDoc(referenciaOtroUsuario, {
         challenges: arrayUnion({
-          ...otherChallenge,
+          ...otroReto,
           status: "completed",
         }),
       });
 
       toast({
-        title: "Challenge completed!",
-        description: "You've successfully completed the challenge.",
+        title: "¡Reto completado!",
+        description: "Has completado el reto exitosamente.",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to complete challenge",
+        description: "No se pudo completar el reto",
         variant: "destructive",
       });
     }
   };
 
-  const handleFailedChallenge = async (challengeId: string, userId: string) => {
-    console.log("Completing challenge:", challengeId, "for user:", userId);
+  const manejarRetoFallido = async (idReto: string, idUsuario: string) => {
+    console.log("Fallando reto:", idReto, "para el usuario:", idUsuario);
     try {
-      const userRef = doc(db, "users", userId);
+      const referenciaUsuario = doc(db, "users", idUsuario);
 
-      const user = users.find((u) => u.id === userId);
-      if (!user) return;
-      console.log("User found:", user);
+      const usuario = usuarios.find((u) => u.id === idUsuario);
+      if (!usuario) return;
+      console.log("Usuario encontrado:", usuario);
 
-      const challenge = user.challenges?.find(
-        (c) => c.challengeId === challengeId
-      );
-      if (!challenge) return;
-      console.log("Challenge found:", challenge);
+      const reto = usuario.challenges?.find((c) => c.challengeId === idReto);
+      if (!reto) return;
+      console.log("Reto encontrado:", reto);
 
-      setUsersChallenges((prev) => ({
+      setRetosDeUsuarios((prev) => ({
         ...prev,
-        [userId]: prev[userId].filter((c) => c.challengeId !== challengeId),
+        [idUsuario]: prev[idUsuario].filter((c) => c.challengeId !== idReto),
       }));
 
-      if (user.balance >= challenge.value) {
-        setBalances((prev) => ({
+      if (usuario.balance >= reto.value) {
+        setSaldos((prev) => ({
           ...prev,
-          [userId]: prev[userId] - challenge.value,
+          [idUsuario]: prev[idUsuario] - reto.value,
         }));
 
-        await updateDoc(userRef, {
-          balance: user.balance - challenge.value,
+        await updateDoc(referenciaUsuario, {
+          balance: usuario.balance - reto.value,
         });
       }
 
-      // Remove the pending challenge
-      await updateDoc(userRef, {
-        challenges: arrayRemove(challenge),
+      // Eliminar el reto pendiente
+      await updateDoc(referenciaUsuario, {
+        challenges: arrayRemove(reto),
       });
 
-      // Add the completed challenge
-      await updateDoc(userRef, {
+      // Agregar el reto fallido
+      await updateDoc(referenciaUsuario, {
         challenges: arrayUnion({
-          ...challenge,
+          ...reto,
           status: "failed",
         }),
       });
 
-      // Update the other user's challenge too
-      const otherUserRef = doc(db, "users", challenge.otherUserId);
-      const otherChallenge = {
-        challengeId: challenge.challengeId,
-        challengeName: challenge.challengeName,
-        otherUserId: userId,
-        otherUsername: user.username,
+      // Actualizar el reto del otro usuario también
+      const referenciaOtroUsuario = doc(db, "users", reto.otherUserId);
+      const otroReto = {
+        challengeId: reto.challengeId,
+        challengeName: reto.challengeName,
+        otherUserId: idUsuario,
+        otherUsername: usuario.username,
         status: "pending",
         isReceived: false,
       };
 
-      await updateDoc(otherUserRef, {
-        challenges: arrayRemove(otherChallenge),
+      await updateDoc(referenciaOtroUsuario, {
+        challenges: arrayRemove(otroReto),
       });
 
-      await updateDoc(otherUserRef, {
+      await updateDoc(referenciaOtroUsuario, {
         challenges: arrayUnion({
-          ...otherChallenge,
+          ...otroReto,
           status: "failed",
         }),
       });
 
       toast({
-        title: "Challenge failed",
-        description: "You've failed the challenge and lost 10 coins.",
+        title: "Reto fallido",
+        description: "Has fallado el reto y perdido 10 monedas.",
         variant: "destructive",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to complete challenge",
+        description: "No se pudo completar el reto",
         variant: "destructive",
       });
     }
   };
 
-  const handleAmountChange = (userId: string, value: string) => {
-    const numValue = Number.parseInt(value) || 0;
-    setAmounts({
-      ...amounts,
-      [userId]: numValue,
+  const manejarCambioCantidad = (idUsuario: string, valor: string) => {
+    const valorNumerico = Number.parseInt(valor) || 0;
+    setCantidades({
+      ...cantidades,
+      [idUsuario]: valorNumerico,
     });
   };
 
-  const handleAddFunds = async (userId: string) => {
-    if (!amounts[userId]) {
+  const manejarAgregarFondos = async (idUsuario: string) => {
+    if (!cantidades[idUsuario]) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid amount",
+        title: "Cantidad inválida",
+        description: "Por favor, introduce una cantidad válida",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      const userRef = doc(db, "users", userId);
-      const user = users.find((u) => u.id === userId);
+      const referenciaUsuario = doc(db, "users", idUsuario);
+      const usuario = usuarios.find((u) => u.id === idUsuario);
 
-      if (!user) return;
+      if (!usuario) return;
 
-      await updateDoc(userRef, {
-        balance: user.balance + amounts[userId],
+      await updateDoc(referenciaUsuario, {
+        balance: usuario.balance + cantidades[idUsuario],
       });
 
-      // Update local state
-      setUsers(
-        users.map((u) =>
-          u.id === userId ? { ...u, balance: u.balance + amounts[userId] } : u
+      // Actualizar estado local
+      setUsuarios(
+        usuarios.map((u) =>
+          u.id === idUsuario
+            ? { ...u, balance: u.balance + cantidades[idUsuario] }
+            : u
         )
       );
 
-      setAmounts({
-        ...amounts,
-        [userId]: 0,
+      setCantidades({
+        ...cantidades,
+        [idUsuario]: 0,
       });
 
-      setBalances((prev) => ({
+      setSaldos((prev) => ({
         ...prev,
-        [userId]: prev[userId] + amounts[userId],
+        [idUsuario]: prev[idUsuario] + cantidades[idUsuario],
       }));
 
       toast({
-        title: "Funds added",
-        description: `Added ${amounts[userId]} coins to ${user.username}'s balance`,
+        title: "Fondos agregados",
+        description: `Se agregaron ${cantidades[idUsuario]} monedas al saldo de ${usuario.username}`,
       });
     } catch (error) {
-      console.error("Error adding funds:", error);
+      console.error("Error al agregar fondos:", error);
       toast({
         title: "Error",
-        description: "Failed to add funds. Check console for details.",
+        description:
+          "No se pudieron agregar fondos. Consulta la consola para más detalles.",
         variant: "destructive",
       });
     }
   };
 
-  const handleRemoveFunds = async (userId: string) => {
-    if (!amounts[userId]) {
+  const manejarRemoverFondos = async (idUsuario: string) => {
+    if (!cantidades[idUsuario]) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid amount",
+        title: "Cantidad inválida",
+        description: "Por favor, introduce una cantidad válida",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      const userRef = doc(db, "users", userId);
-      const user = users.find((u) => u.id === userId);
+      const referenciaUsuario = doc(db, "users", idUsuario);
+      const usuario = usuarios.find((u) => u.id === idUsuario);
 
-      if (!user) return;
+      if (!usuario) return;
 
-      if (user.balance < amounts[userId]) {
+      if (usuario.balance < cantidades[idUsuario]) {
         toast({
-          title: "Insufficient balance",
-          description: `User only has ${user.balance} coins`,
+          title: "Saldo insuficiente",
+          description: `El usuario solo tiene ${usuario.balance} monedas`,
           variant: "destructive",
         });
         return;
       }
 
-      await updateDoc(userRef, {
-        balance: user.balance - amounts[userId],
+      await updateDoc(referenciaUsuario, {
+        balance: usuario.balance - cantidades[idUsuario],
       });
 
-      // Update local state
-      setUsers(
-        users.map((u) =>
-          u.id === userId ? { ...u, balance: u.balance - amounts[userId] } : u
+      // Actualizar estado local
+      setUsuarios(
+        usuarios.map((u) =>
+          u.id === idUsuario
+            ? { ...u, balance: u.balance - cantidades[idUsuario] }
+            : u
         )
       );
 
-      setAmounts({
-        ...amounts,
-        [userId]: 0,
+      setCantidades({
+        ...cantidades,
+        [idUsuario]: 0,
       });
 
-      setBalances((prev) => ({
+      setSaldos((prev) => ({
         ...prev,
-        [userId]: prev[userId] - amounts[userId],
+        [idUsuario]: prev[idUsuario] - cantidades[idUsuario],
       }));
 
       toast({
-        title: "Funds removed",
-        description: `Removed ${amounts[userId]} coins from ${user.username}'s balance`,
+        title: "Fondos removidos",
+        description: `Se removieron ${cantidades[idUsuario]} monedas del saldo de ${usuario.username}`,
       });
     } catch (error) {
-      console.error("Error removing funds:", error);
+      console.error("Error al remover fondos:", error);
       toast({
         title: "Error",
-        description: "Failed to remove funds. Check console for details.",
+        description:
+          "No se pudieron remover fondos. Consulta la consola para más detalles.",
         variant: "destructive",
       });
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return <LoadingSpinner />;
   }
 
@@ -402,23 +403,27 @@ export default function UsersList() {
       <div className="text-center p-8 bg-card rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Error</h2>
         <p className="text-muted-foreground mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
+        <Button onClick={() => window.location.reload()}>
+          Intentar de nuevo
+        </Button>
       </div>
     );
   }
 
-  if (users.length === 0) {
+  if (usuarios.length === 0) {
     return (
       <div className="text-center p-8 bg-card rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">No users found</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          No se encontraron usuarios
+        </h2>
         <p className="text-muted-foreground">
-          Create an account first to see users here.
+          Crea una cuenta primero para ver usuarios aquí.
         </p>
         <div className="mt-4 p-4 bg-muted rounded-md">
-          <p className="text-sm">Debug info:</p>
+          <p className="text-sm">Información de depuración:</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Make sure your Firestore security rules allow reading the users
-            collection.
+            Asegúrate de que las reglas de seguridad de Firestore permitan leer
+            la colección de usuarios.
           </p>
         </div>
       </div>
@@ -429,46 +434,48 @@ export default function UsersList() {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Users ({users.length})</h2>
+          <h2 className="text-xl font-semibold">
+            Usuarios ({usuarios.length})
+          </h2>
           <Button
             variant="outline"
             size="sm"
             onClick={() => window.location.reload()}
           >
-            Refresh
+            Refrescar
           </Button>
         </div>
-        <Tabs defaultValue="money">
+        <Tabs defaultValue="dinero">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="money">Dinero</TabsTrigger>
-            <TabsTrigger value="challenges">Challenges</TabsTrigger>
+            <TabsTrigger value="dinero">Dinero</TabsTrigger>
+            <TabsTrigger value="retos">Retos</TabsTrigger>
           </TabsList>
-          <TabsContent value="money" className="mt-4">
-            {users
+          <TabsContent value="dinero" className="mt-4">
+            {usuarios
               .sort((a, b) => b.balance - a.balance)
-              .map((user, i) => (
-                <Card key={user.id} className="mb-4">
+              .map((usuario, i) => (
+                <Card key={usuario.id} className="mb-4">
                   <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                       <span>
                         {i === 0 && "🥇 "}
                         {i === 1 && "🥈 "}
                         {i === 2 && "🥉 "}
-                        {user.username}
+                        {usuario.username}
                       </span>
                       <span className="text-primary">
-                        {balances[user.id]} 🪙
+                        {saldos[usuario.id]} 🪙
                       </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="mb-4">
-                      Challenges hechos:{" "}
-                      {user.challenges
-                        ? user.challenges.filter(
-                            (challenge) =>
-                              challenge.status === "completed" &&
-                              challenge.isReceived === true
+                      Retos completados:{" "}
+                      {usuario.challenges
+                        ? usuario.challenges.filter(
+                            (reto) =>
+                              reto.status === "completed" &&
+                              reto.isReceived === true
                           ).length
                         : 0}{" "}
                       🏆
@@ -477,45 +484,45 @@ export default function UsersList() {
                 </Card>
               ))}
           </TabsContent>
-          <TabsContent value="challenges" className="mt-4">
-            {users
+          <TabsContent value="retos" className="mt-4">
+            {usuarios
               .sort(
                 (a, b) =>
-                  usersChallenges[b.id].filter(
-                    (challenge) =>
-                      challenge.status === "completed" &&
-                      challenge.isReceived === true
+                  retosDeUsuarios[b.id].filter(
+                    (reto) =>
+                      reto.status === "completed" && reto.isReceived === true
                   ).length -
-                  usersChallenges[a.id].filter(
-                    (challenge) =>
-                      challenge.status === "completed" &&
-                      challenge.isReceived === true
+                  retosDeUsuarios[a.id].filter(
+                    (reto) =>
+                      reto.status === "completed" && reto.isReceived === true
                   ).length
               )
-              .map((user, i) => (
-                <Card key={user.id} className="mb-4">
+              .map((usuario, i) => (
+                <Card key={usuario.id} className="mb-4">
                   <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                       <span>
                         {i === 0 && "🥇 "}
                         {i === 1 && "🥈 "}
                         {i === 2 && "🥉 "}
-                        {user.username}
+                        {usuario.username}
                       </span>
                       <span className="text-primary">
                         {
-                          usersChallenges[user.id].filter(
-                            (challenge) =>
-                              challenge.status === "completed" &&
-                              challenge.isReceived === true
+                          retosDeUsuarios[usuario.id].filter(
+                            (reto) =>
+                              reto.status === "completed" &&
+                              reto.isReceived === true
                           ).length
                         }{" "}
-                        challenges
+                        retos
                       </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="mb-4">Dinero total: {balances[user.id]} 🪙</p>
+                    <p className="mb-4">
+                      Dinero total: {saldos[usuario.id]} 🪙
+                    </p>
                   </CardContent>
                 </Card>
               ))}
@@ -528,47 +535,51 @@ export default function UsersList() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Users ({users.length})</h2>
+        <h2 className="text-xl font-semibold">Usuarios ({usuarios.length})</h2>
         <Button
           variant="outline"
           size="sm"
           onClick={() => window.location.reload()}
         >
-          Refresh
+          Refrescar
         </Button>
       </div>
 
-      {users.map((user) => (
-        <Card key={user.id}>
+      {usuarios.map((usuario) => (
+        <Card key={usuario.id}>
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
-              <span>{user.username}</span>
-              <span className="text-primary">{balances[user.id]} coins</span>
+              <span>{usuario.username}</span>
+              <span className="text-primary">{saldos[usuario.id]} monedas</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">{user.email}</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              {usuario.email}
+            </p>
             <div className="flex items-center space-x-4">
               <div className="flex-1">
                 <Input
                   type="number"
                   min="0"
-                  placeholder="Amount"
-                  value={amounts[user.id] || ""}
-                  onChange={(e) => handleAmountChange(user.id, e.target.value)}
+                  placeholder="Cantidad"
+                  value={cantidades[usuario.id] || ""}
+                  onChange={(e) =>
+                    manejarCambioCantidad(usuario.id, e.target.value)
+                  }
                 />
               </div>
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => handleAddFunds(user.id)}
+                onClick={() => manejarAgregarFondos(usuario.id)}
               >
                 <Plus className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => handleRemoveFunds(user.id)}
+                onClick={() => manejarRemoverFondos(usuario.id)}
               >
                 <Minus className="h-4 w-4" />
               </Button>
@@ -577,50 +588,46 @@ export default function UsersList() {
           </CardContent>
           <CardFooter className="flex-col items-start space-y-4">
             <CardTitle>
-              <span>Pending challenges</span>
+              <span>Retos pendientes</span>
             </CardTitle>
             {(() => {
-              const pendingChallenges = usersChallenges[user.id].filter(
+              const retosPendientes = retosDeUsuarios[usuario.id].filter(
                 (c) => c.isReceived === true && c.status === "pending"
               );
 
-              if (pendingChallenges.length === 0) {
+              if (retosPendientes.length === 0) {
                 return (
-                  <p className="text-muted-foreground">No pending challenges</p>
+                  <p className="text-muted-foreground">
+                    No hay retos pendientes
+                  </p>
                 );
               }
 
               return (
                 <div className="space-y-2">
-                  {pendingChallenges.map((challenge) => (
+                  {retosPendientes.map((reto) => (
                     <div
-                      key={challenge.challengeId}
+                      key={reto.challengeId}
                       className="flex justify-between items-center"
                     >
-                      <span>{challenge.challengeName}</span>
+                      <span>{reto.challengeName}</span>
                       <div>
                         <Button
                           variant="outline"
                           onClick={() =>
-                            handleFailedChallenge(
-                              challenge.challengeId,
-                              user.id
-                            )
+                            manejarRetoFallido(reto.challengeId, usuario.id)
                           }
                         >
                           <XCircle className="h-4 w-4 mr-2" />
-                          Fail
+                          Fallar
                         </Button>
                         <Button
                           onClick={() =>
-                            handleCompleteChallenge(
-                              challenge.challengeId,
-                              user.id
-                            )
+                            manejarCompletarReto(reto.challengeId, usuario.id)
                           }
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Complete
+                          Completar
                         </Button>
                       </div>
                     </div>

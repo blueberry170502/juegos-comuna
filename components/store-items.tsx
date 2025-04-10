@@ -261,11 +261,11 @@ export default function StoreItems() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold">Available Items</h2>
+        <h2 className="text-xl font-semibold">Artículos Disponibles</h2>
         <div className="bg-card px-4 py-2 rounded-md">
-          <span className="font-medium">Your Balance: </span>
+          <span className="font-medium">Tu Saldo: </span>
           <span className="text-primary font-bold">
-            {userData?.balance || 0} coins
+            {userData?.balance || 0} monedas
           </span>
         </div>
       </div>
@@ -276,12 +276,14 @@ export default function StoreItems() {
             <CardHeader>
               <CardTitle>{item.name}</CardTitle>
               <CardDescription>
-                {item.type === "challenge" ? "Challenge Item" : "Regular Item"}
+                {item.type === "challenge"
+                  ? "Artículo de Desafío"
+                  : "Artículo Regular"}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">{item.description}</p>
-              <p className="font-bold text-lg">{item.price} coins</p>
+              <p className="font-bold text-lg">{item.price} monedas</p>
             </CardContent>
             <CardFooter>
               <Button
@@ -289,7 +291,7 @@ export default function StoreItems() {
                 disabled={(userData?.balance ?? 0) < item.price}
                 className="w-full"
               >
-                Purchase
+                Comprar
               </Button>
             </CardFooter>
           </Card>
@@ -302,18 +304,18 @@ export default function StoreItems() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Select User for Challenge</DialogTitle>
+            <DialogTitle>Seleccionar Usuario para el Desafío</DialogTitle>
             <DialogDescription>
-              Choose a user to send the "{selectedItem?.name}" challenge to
+              Elige un usuario para enviar el desafío "{selectedItem?.name}"
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="user">Select User</Label>
+              <Label htmlFor="user">Seleccionar Usuario</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a user" />
+                  <SelectValue placeholder="Selecciona un usuario" />
                 </SelectTrigger>
                 <SelectContent>
                   {users.map((user) => (
@@ -328,9 +330,9 @@ export default function StoreItems() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedItem(null)}>
-              Cancel
+              Cancelar
             </Button>
-            <Button onClick={handleChallengeConfirm}>Send Challenge</Button>
+            <Button onClick={handleChallengeConfirm}>Enviar Desafío</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

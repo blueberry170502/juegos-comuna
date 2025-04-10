@@ -258,15 +258,15 @@ export default function TransferMoney() {
       <div className="grid md:grid-cols-2 gap-8">
         <Card>
           <CardHeader>
-            <CardTitle>Transfer Coins</CardTitle>
-            <CardDescription>Send coins to another player</CardDescription>
+            <CardTitle>Transferir Monedas</CardTitle>
+            <CardDescription>Envía monedas a otro jugador</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="recipient">Recipient</Label>
+              <Label htmlFor="recipient">Destinatario</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a user" />
+                  <SelectValue placeholder="Selecciona un usuario" />
                 </SelectTrigger>
                 <SelectContent>
                   {users.map((user) => (
@@ -279,7 +279,7 @@ export default function TransferMoney() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">Cantidad</Label>
               <div className="flex space-x-2">
                 <Input
                   id="amount"
@@ -287,29 +287,30 @@ export default function TransferMoney() {
                   min="1"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
+                  placeholder="Ingresa la cantidad"
                 />
                 <Button
                   onClick={handleTransfer}
                   disabled={loading || !selectedUser || !amount}
                 >
-                  Transfer
+                  Transferir
                 </Button>
               </div>
             </div>
           </CardContent>
           <CardFooter>
             <p className="text-sm text-muted-foreground">
-              Your balance:{" "}
-              <span className="font-bold">{userData?.balance || 0}</span> coins
+              Tu saldo:{" "}
+              <span className="font-bold">{userData?.balance || 0}</span>{" "}
+              monedas
             </p>
           </CardFooter>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Transfer History</CardTitle>
-            <CardDescription>Recent transfers</CardDescription>
+            <CardTitle>Historial de Transferencias</CardTitle>
+            <CardDescription>Transferencias recientes</CardDescription>
           </CardHeader>
           <CardContent>
             {transfers.length > 0 ? (
@@ -337,15 +338,15 @@ export default function TransferMoney() {
                           <div className="ml-3">
                             <p className="text-sm font-medium">
                               {isSender
-                                ? `To: ${transfer.toUsername}`
-                                : `From: ${transfer.fromUsername}`}
+                                ? `Para: ${transfer.toUsername}`
+                                : `De: ${transfer.fromUsername}`}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               {transfer.timestamp
                                 ? new Date(
                                     transfer.timestamp.seconds * 1000
                                   ).toLocaleString()
-                                : "Processing..."}
+                                : "Procesando..."}
                             </p>
                           </div>
                         </div>
@@ -355,7 +356,7 @@ export default function TransferMoney() {
                           }`}
                         >
                           {isSender ? "-" : "+"}
-                          {transfer.amount} coins
+                          {transfer.amount} monedas
                         </div>
                       </div>
                     </li>
@@ -364,7 +365,7 @@ export default function TransferMoney() {
               </ul>
             ) : (
               <p className="text-sm text-muted-foreground">
-                No transfer history yet
+                Aún no hay historial de transferencias
               </p>
             )}
           </CardContent>
