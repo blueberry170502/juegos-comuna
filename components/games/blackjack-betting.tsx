@@ -72,7 +72,7 @@ export default function BlackjackBetting() {
         setUserBets(fetchedBets.filter((bet) => bet.userId === user.uid));
         setTotalPot(total);
       } catch (error) {
-        console.error("Error fetching bets:", error);
+        console.error("Error al obtener las apuestas:", error);
       }
     };
 
@@ -83,7 +83,7 @@ export default function BlackjackBetting() {
     if (!userData || !user) {
       toast({
         title: "Error",
-        description: "You must be logged in to place a bet",
+        description: "Debes iniciar sesión para realizar una apuesta",
         variant: "destructive",
       });
       return;
@@ -93,8 +93,8 @@ export default function BlackjackBetting() {
 
     if (isNaN(betAmount) || betAmount <= 0) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid bet amount",
+        title: "Cantidad inválida",
+        description: "Por favor, ingresa una cantidad válida para apostar",
         variant: "destructive",
       });
       return;
@@ -102,8 +102,8 @@ export default function BlackjackBetting() {
 
     if (betAmount > userData.balance) {
       toast({
-        title: "Insufficient funds",
-        description: "You don't have enough coins for this bet",
+        title: "Fondos insuficientes",
+        description: "No tienes suficientes monedas para esta apuesta",
         variant: "destructive",
       });
       return;
@@ -112,31 +112,31 @@ export default function BlackjackBetting() {
     setLoading(true);
 
     try {
-      // Update user balance
+      // Actualizar el saldo del usuario
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         balance: userData.balance - betAmount,
       });
 
-      // Add bet to database
+      // Agregar la apuesta a la base de datos
       await addDoc(collection(db, "bets"), {
         userId: user.uid,
         username: userData.username,
         game: "blackjack",
         amount: betAmount,
         timestamp: serverTimestamp(),
-        status: "pending", // pending, won, lost
+        status: "pending", // pendiente, ganado, perdido
       });
 
       toast({
-        title: "Bet placed!",
-        description: `You bet ${betAmount} coins on Blackjack`,
+        title: "¡Apuesta realizada!",
+        description: `Apostaste ${betAmount} monedas en Blackjack`,
       });
 
-      // Reset form
+      // Reiniciar el formulario
       setAmount("");
 
-      // Refresh bets - CORREGIDO: Ahora filtramos por status: "pending"
+      // Refrescar las apuestas
       const betsRef = collection(db, "bets");
       const q = query(
         betsRef,
@@ -159,10 +159,10 @@ export default function BlackjackBetting() {
       setUserBets(fetchedBets.filter((bet) => bet.userId === user.uid));
       setTotalPot(total);
     } catch (error) {
-      console.error("Error placing bet:", error);
+      console.error("Error al realizar la apuesta:", error);
       toast({
         title: "Error",
-        description: "Failed to place bet. Please try again.",
+        description: "No se pudo realizar la apuesta. Inténtalo de nuevo.",
         variant: "destructive",
       });
     } finally {
@@ -170,13 +170,11 @@ export default function BlackjackBetting() {
     }
   };
 
-  // Añadir función para calcular el beneficio potencial
   const calculatePotentialWinnings = (bet: BlackjackBet): number => {
-    // Blackjack typically pays 3:2
+    // Blackjack típicamente paga 3:2
     return bet.amount * 2.5;
   };
 
-  // Añadir el cálculo del beneficio total potencial
   const totalPotentialWinnings = userBets.reduce(
     (sum, bet) => sum + calculatePotentialWinnings(bet),
     0
@@ -188,14 +186,14 @@ export default function BlackjackBetting() {
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Place Your Bet</CardTitle>
+              <CardTitle>Realiza tu apuesta</CardTitle>
               <CardDescription>
-                Enter the amount you want to bet on Blackjack
+                Ingresa la cantidad que deseas apostar en Blackjack
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="amount">Bet Amount</Label>
+                <Label htmlFor="amount">Cantidad a apostar</Label>
                 <div className="flex space-x-2">
                   <Input
                     id="amount"
@@ -203,32 +201,37 @@ export default function BlackjackBetting() {
                     min="1"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
+                    placeholder="Ingresa la cantidad"
                   />
                   <Button onClick={handleBet} disabled={loading || !amount}>
-                    Place Bet
+                    Apostar
                   </Button>
                 </div>
               </div>
 
               <div className="bg-muted p-4 rounded-md">
-                <h3 className="font-medium mb-2">Blackjack Rules</h3>
+                <h3 className="font-medium mb-2">Reglas de Blackjack</h3>
                 <ul className="text-sm space-y-1 list-disc pl-5">
                   <li>
-                    Try to get a hand value closer to 21 than the dealer without
-                    going over
+                    Intenta obtener un valor de mano más cercano a 21 que el
+                    crupier sin pasarte
                   </li>
-                  <li>Face cards are worth 10, Aces are worth 1 or 11</li>
-                  <li>Dealer must hit on 16 or less and stand on 17 or more</li>
-                  <li>Blackjack (an Ace with a 10-value card) pays 3:2</li>
+                  <li>
+                    Las cartas con figuras valen 10, los Ases valen 1 o 11
+                  </li>
+                  <li>
+                    El crupier debe pedir carta con 16 o menos y plantarse con
+                    17 o más
+                  </li>
+                  <li>Blackjack (un As con una carta de valor 10) paga 3:2</li>
                 </ul>
               </div>
             </CardContent>
             <CardFooter>
               <p className="text-sm text-muted-foreground">
-                Your balance:{" "}
+                Tu saldo:{" "}
                 <span className="font-bold">{userData?.balance || 0}</span>{" "}
-                coins
+                monedas
               </p>
             </CardFooter>
           </Card>
@@ -237,36 +240,38 @@ export default function BlackjackBetting() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Blackjack Stats</CardTitle>
-              <CardDescription>Current bets and pot size</CardDescription>
+              <CardTitle>Estadísticas de Blackjack</CardTitle>
+              <CardDescription>
+                Apuestas actuales y tamaño del bote
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Pot:</span>
+                <span className="text-sm">Bote total:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPot} coins
+                  {totalPot} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Your Bets:</span>
+                <span className="text-sm">Tus apuestas:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} coins
+                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Potential Winnings:</span>
+                <span className="text-sm">Ganancias potenciales:</span>
                 <span className="font-bold flex items-center text-green-600">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPotentialWinnings} coins
+                  {totalPotentialWinnings} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Players:</span>
+                <span className="text-sm">Jugadores totales:</span>
                 <span className="font-bold">
                   {new Set(allBets.map((bet) => bet.userId)).size}
                 </span>
@@ -276,7 +281,7 @@ export default function BlackjackBetting() {
 
           <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Your Bets</CardTitle>
+              <CardTitle>Tus apuestas</CardTitle>
             </CardHeader>
             <CardContent>
               {userBets.length > 0 ? (
@@ -285,17 +290,17 @@ export default function BlackjackBetting() {
                     <li key={bet.id} className="text-sm border-b pb-2">
                       <div className="flex justify-between">
                         <span>Blackjack</span>
-                        <span className="font-bold">{bet.amount} coins</span>
+                        <span className="font-bold">{bet.amount} monedas</span>
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Status: {bet.status}
+                        Estado: {bet.status}
                       </div>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  You haven't placed any bets yet
+                  Aún no has realizado ninguna apuesta
                 </p>
               )}
             </CardContent>

@@ -190,14 +190,14 @@ export default function PokerBetting() {
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Place Your Bet</CardTitle>
+              <CardTitle>Realiza Tu Apuesta</CardTitle>
               <CardDescription>
-                Enter the amount you want to bet on Poker
+                Ingresa la cantidad que deseas apostar en Poker
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="amount">Bet Amount</Label>
+                <Label htmlFor="amount">Cantidad a Apostar</Label>
                 <div className="flex space-x-2">
                   <Input
                     id="amount"
@@ -205,34 +205,35 @@ export default function PokerBetting() {
                     min="1"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
+                    placeholder="Ingresa la cantidad"
                   />
                   <Button onClick={handleBet} disabled={loading || !amount}>
-                    Place Bet
+                    Apostar
                   </Button>
                 </div>
               </div>
 
               <div className="bg-muted p-4 rounded-md">
-                <h3 className="font-medium mb-2">Poker Rules</h3>
+                <h3 className="font-medium mb-2">Reglas del Poker</h3>
                 <ul className="text-sm space-y-1 list-disc pl-5">
-                  <li>Players are dealt cards and bet in rounds</li>
-                  <li>The best hand wins the pot</li>
+                  <li>Los jugadores reciben cartas y apuestan en rondas</li>
+                  <li>La mejor mano gana el bote</li>
                   <li>
-                    Hand rankings: Royal Flush, Straight Flush, Four of a Kind,
-                    Full House, etc.
+                    Clasificación de manos: Escalera Real, Escalera de Color,
+                    Póker, Full, etc.
                   </li>
                   <li>
-                    Betting continues until all players fold or the showdown
+                    Las apuestas continúan hasta que todos los jugadores se
+                    retiran o llega el enfrentamiento final
                   </li>
                 </ul>
               </div>
             </CardContent>
             <CardFooter>
               <p className="text-sm text-muted-foreground">
-                Your balance:{" "}
+                Tu saldo:{" "}
                 <span className="font-bold">{userData?.balance || 0}</span>{" "}
-                coins
+                monedas
               </p>
             </CardFooter>
           </Card>
@@ -241,36 +242,38 @@ export default function PokerBetting() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Poker Stats</CardTitle>
-              <CardDescription>Current bets and pot size</CardDescription>
+              <CardTitle>Estadísticas de Poker</CardTitle>
+              <CardDescription>
+                Apuestas actuales y tamaño del bote
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Pot:</span>
+                <span className="text-sm">Bote Total:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPot} coins
+                  {totalPot} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Your Bets:</span>
+                <span className="text-sm">Tus Apuestas:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} coins
+                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Potential Winnings:</span>
+                <span className="text-sm">Ganancias Potenciales:</span>
                 <span className="font-bold flex items-center text-green-600">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPotentialWinnings} coins
+                  {totalPotentialWinnings} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Players:</span>
+                <span className="text-sm">Jugadores Totales:</span>
                 <span className="font-bold">
                   {new Set(allBets.map((bet) => bet.userId)).size}
                 </span>
@@ -280,7 +283,7 @@ export default function PokerBetting() {
 
           <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Your Bets</CardTitle>
+              <CardTitle>Tus Apuestas</CardTitle>
             </CardHeader>
             <CardContent>
               {userBets.length > 0 ? (
@@ -289,17 +292,17 @@ export default function PokerBetting() {
                     <li key={bet.id} className="text-sm border-b pb-2">
                       <div className="flex justify-between">
                         <span>Poker</span>
-                        <span className="font-bold">{bet.amount} coins</span>
+                        <span className="font-bold">{bet.amount} monedas</span>
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Status: {bet.status}
+                        Estado: {bet.status}
                       </div>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  You haven't placed any bets yet
+                  Aún no has realizado ninguna apuesta
                 </p>
               )}
             </CardContent>

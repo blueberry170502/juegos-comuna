@@ -382,14 +382,14 @@ export default function RouletteBetting() {
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Place Your Bet</CardTitle>
+              <CardTitle>Realiza tu Apuesta</CardTitle>
               <CardDescription>
-                Choose your bet type, amount, and value
+                Elige el tipo de apuesta, cantidad y valor
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="betType">Bet Type</Label>
+                <Label htmlFor="betType">Tipo de Apuesta</Label>
                 <Select
                   value={betType}
                   onValueChange={(value) => {
@@ -398,37 +398,37 @@ export default function RouletteBetting() {
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select bet type" />
+                    <SelectValue placeholder="Selecciona el tipo de apuesta" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="number">Straight Up (Number)</SelectItem>
-                    <SelectItem value="color">Color (Red/Black)</SelectItem>
+                    <SelectItem value="number">Número Directo</SelectItem>
+                    <SelectItem value="color">Color (Rojo/Negro)</SelectItem>
                     <SelectItem value="section">
-                      Section (1-12, 13-24, 25-36)
+                      Sección (1-12, 13-24, 25-36)
                     </SelectItem>
                     <SelectItem value="dozen">
-                      Dozen (1-12, 13-24, 25-36)
+                      Docena (1-12, 13-24, 25-36)
                     </SelectItem>
                     <SelectItem value="column">
-                      Column (1st, 2nd, 3rd)
+                      Columna (1ra, 2da, 3ra)
                     </SelectItem>
-                    <SelectItem value="evenOdd">Even/Odd</SelectItem>
+                    <SelectItem value="evenOdd">Par/Impar</SelectItem>
                     <SelectItem value="highLow">
-                      High/Low (1-18, 19-36)
+                      Alto/Bajo (1-18, 19-36)
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="betValue">Bet Value</Label>
+                <Label htmlFor="betValue">Valor de la Apuesta</Label>
                 <div className="max-h-48 overflow-y-auto p-2 border rounded-md">
                   {renderBetOptions()}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="amount">Bet Amount</Label>
+                <Label htmlFor="amount">Cantidad de la Apuesta</Label>
                 <div className="flex space-x-2">
                   <Input
                     id="amount"
@@ -436,22 +436,22 @@ export default function RouletteBetting() {
                     min="1"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
+                    placeholder="Ingresa la cantidad"
                   />
                   <Button
                     onClick={handleBet}
                     disabled={loading || !betValue || !amount}
                   >
-                    Place Bet
+                    Realizar Apuesta
                   </Button>
                 </div>
               </div>
             </CardContent>
             <CardFooter>
               <p className="text-sm text-muted-foreground">
-                Your balance:{" "}
+                Tu saldo:{" "}
                 <span className="font-bold">{userData?.balance || 0}</span>{" "}
-                coins
+                monedas
               </p>
             </CardFooter>
           </Card>
@@ -460,36 +460,38 @@ export default function RouletteBetting() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Roulette Stats</CardTitle>
-              <CardDescription>Current bets and pot size</CardDescription>
+              <CardTitle>Estadísticas de la Ruleta</CardTitle>
+              <CardDescription>
+                Apuestas actuales y tamaño del bote
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Pot:</span>
+                <span className="text-sm">Bote Total:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPot} coins
+                  {totalPot} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Your Bets:</span>
+                <span className="text-sm">Tus Apuestas:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} coins
+                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Potential Winnings:</span>
+                <span className="text-sm">Ganancias Potenciales:</span>
                 <span className="font-bold flex items-center text-green-600">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPotentialWinnings} coins
+                  {totalPotentialWinnings} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Players:</span>
+                <span className="text-sm">Jugadores Totales:</span>
                 <span className="font-bold">
                   {new Set(allBets.map((bet) => bet.userId)).size}
                 </span>
@@ -499,7 +501,7 @@ export default function RouletteBetting() {
 
           <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Your Bets</CardTitle>
+              <CardTitle>Tus Apuestas</CardTitle>
             </CardHeader>
             <CardContent>
               {userBets.length > 0 ? (
@@ -510,14 +512,14 @@ export default function RouletteBetting() {
                         <span>
                           {bet.betType}: {bet.betValue}
                         </span>
-                        <span className="font-bold">{bet.amount} coins</span>
+                        <span className="font-bold">{bet.amount} monedas</span>
                       </div>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  You haven't placed any bets yet
+                  Aún no has realizado ninguna apuesta
                 </p>
               )}
             </CardContent>

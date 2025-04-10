@@ -30,30 +30,30 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { href: "/", label: "Home", icon: <Home className="h-4 w-4 mr-2" /> },
+    { href: "/", label: "Inicio", icon: <Home className="h-4 w-4 mr-2" /> },
     {
       href: "/store",
-      label: "Store",
+      label: "Tienda",
       icon: <ShoppingCart className="h-4 w-4 mr-2" />,
     },
     {
       href: "/transfer",
-      label: "Transfer",
+      label: "Transferir",
       icon: <Coins className="h-4 w-4 mr-2" />,
     },
     {
       href: "/users",
-      label: "Users",
+      label: "Usuarios",
       icon: <Users className="h-4 w-4 mr-2" />,
     },
     {
       href: "/profile",
-      label: "Profile",
+      label: "Perfil",
       icon: <User className="h-4 w-4 mr-2" />,
     },
     {
       href: "/challenges",
-      label: "Challenges",
+      label: "Desafíos",
       icon: <User className="h-4 w-4 mr-2" />,
     },
   ];
@@ -62,7 +62,7 @@ export default function Navbar() {
   const gameItems = [
     {
       href: "/games/roulette",
-      label: "Roulette",
+      label: "Ruleta",
       icon: <Gamepad className="h-4 w-4 mr-2" />,
     },
     {
@@ -72,26 +72,26 @@ export default function Navbar() {
     },
     {
       href: "/games/poker",
-      label: "Poker",
+      label: "Póker",
       icon: <Gamepad className="h-4 w-4 mr-2" />,
     },
     {
       href: "/games/horse-racing",
-      label: "Horse Racing",
+      label: "Carreras de Caballos",
       icon: <Gamepad className="h-4 w-4 mr-2" />,
     },
     {
       href: "/games/slots",
-      label: "Slot Machine",
+      label: "Máquina Tragamonedas",
       icon: <Gamepad className="h-4 w-4 mr-2" />,
     },
   ];
 
-  // Admin-only nav items
+  // Elementos de navegación solo para administradores
   const adminItems = [
     {
       href: "/admin/games",
-      label: "Game Admin",
+      label: "Administrar Juegos",
       icon: <Gamepad className="h-4 w-4 mr-2" />,
     },
   ];
@@ -106,13 +106,13 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="font-bold text-xl">
-              Party Game
+              La Casa de la Comuna
             </Link>
           </div>
 
           {user && (
             <>
-              {/* Desktop Navigation */}
+              {/* Navegación en escritorio */}
               <div className="hidden md:flex space-x-4">
                 {navItems.map((item) => (
                   <Link
@@ -130,11 +130,11 @@ export default function Navbar() {
                   </Link>
                 ))}
 
-                {/* Games Dropdown - Desktop */}
+                {/* Menú desplegable de juegos - Escritorio */}
                 <div className="relative group">
                   <button className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-foreground hover:bg-muted">
                     <Gamepad className="h-4 w-4 mr-2" />
-                    Games
+                    Juegos
                   </button>
                   <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-background border border-border hidden group-hover:block z-50">
                     <div className="py-1">
@@ -181,22 +181,22 @@ export default function Navbar() {
                   className="flex items-center"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  Cerrar Sesión
                 </Button>
               </div>
 
-              {/* Mobile menu button */}
+              {/* Botón del menú móvil */}
               <div className="md:hidden">
                 <Sheet open={isOpen} onOpenChange={setIsOpen}>
                   <SheetTrigger asChild>
                     <Button variant="ghost" size="icon">
                       <Menu className="h-6 w-6" />
-                      <span className="sr-only">Toggle menu</span>
+                      <span className="sr-only">Alternar menú</span>
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="right" className="w-[80%] sm:w-[350px]">
                     <SheetHeader>
-                      <SheetTitle>Navigation Menu</SheetTitle>
+                      <SheetTitle>Menú de Navegación</SheetTitle>
                     </SheetHeader>
                     <div className="flex flex-col space-y-4 py-4">
                       {navItems.map((item) => (
@@ -216,9 +216,9 @@ export default function Navbar() {
                         </Link>
                       ))}
 
-                      {/* Games Section - Mobile */}
+                      {/* Sección de Juegos - Móvil */}
                       <div className="px-3 py-2">
-                        <h3 className="text-sm font-medium mb-2">Games</h3>
+                        <h3 className="text-sm font-medium mb-2">Juegos</h3>
                         <div className="pl-2 border-l-2 border-muted space-y-1">
                           {gameItems.map((item) => (
                             <Link
@@ -273,7 +273,7 @@ export default function Navbar() {
                         className="flex items-center justify-start px-3"
                       >
                         <LogOut className="h-4 w-4 mr-2" />
-                        Logout
+                        Cerrar Sesión
                       </Button>
                     </div>
                   </SheetContent>

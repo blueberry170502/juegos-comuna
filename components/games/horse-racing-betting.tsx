@@ -245,14 +245,14 @@ export default function HorseRacingBetting() {
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Place Your Bet</CardTitle>
+              <CardTitle>Realiza Tu Apuesta</CardTitle>
               <CardDescription>
-                Choose your horse and bet amount
+                Elige tu caballo y la cantidad a apostar
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Select a Horse</Label>
+                <Label>Selecciona un Caballo</Label>
                 <RadioGroup
                   value={selectedHorse}
                   onValueChange={setSelectedHorse}
@@ -280,7 +280,8 @@ export default function HorseRacingBetting() {
                           >
                             <div className="font-medium">{horse.name}</div>
                             <div className="text-xs text-muted-foreground mt-1">
-                              Total bets: {horseTotals[horse.id] || 0} coins
+                              Total apostado: {horseTotals[horse.id] || 0}{" "}
+                              monedas
                             </div>
                           </div>
                         </Label>
@@ -291,7 +292,7 @@ export default function HorseRacingBetting() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="amount">Bet Amount</Label>
+                <Label htmlFor="amount">Cantidad a Apostar</Label>
                 <div className="flex space-x-2">
                   <Input
                     id="amount"
@@ -299,22 +300,22 @@ export default function HorseRacingBetting() {
                     min="1"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
+                    placeholder="Ingresa la cantidad"
                   />
                   <Button
                     onClick={handleBet}
                     disabled={loading || !selectedHorse || !amount}
                   >
-                    Place Bet
+                    Apostar
                   </Button>
                 </div>
               </div>
             </CardContent>
             <CardFooter>
               <p className="text-sm text-muted-foreground">
-                Your balance:{" "}
+                Tu saldo:{" "}
                 <span className="font-bold">{userData?.balance || 0}</span>{" "}
-                coins
+                monedas
               </p>
             </CardFooter>
           </Card>
@@ -323,43 +324,47 @@ export default function HorseRacingBetting() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Race Stats</CardTitle>
-              <CardDescription>Current bets and pot size</CardDescription>
+              <CardTitle>Estadísticas de la Carrera</CardTitle>
+              <CardDescription>
+                Apuestas actuales y tamaño del bote
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Pot:</span>
+                <span className="text-sm">Bote Total:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPot} coins
+                  {totalPot} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Your Bets:</span>
+                <span className="text-sm">Tus Apuestas:</span>
                 <span className="font-bold flex items-center">
                   <Coins className="h-4 w-4 mr-1" />
-                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} coins
+                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Potential Winnings:</span>
+                <span className="text-sm">Ganancias Potenciales:</span>
                 <span className="font-bold flex items-center text-green-600">
                   <Coins className="h-4 w-4 mr-1" />
-                  {totalPotentialWinnings.toFixed(0)} coins
+                  {totalPotentialWinnings.toFixed(0)} monedas
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Players:</span>
+                <span className="text-sm">Jugadores Totales:</span>
                 <span className="font-bold">
                   {new Set(allBets.map((bet) => bet.userId)).size}
                 </span>
               </div>
 
               <div className="mt-4">
-                <h3 className="text-sm font-medium mb-2">Horse Odds</h3>
+                <h3 className="text-sm font-medium mb-2">
+                  Probabilidades por Caballo
+                </h3>
                 {horses.map((horse) => {
                   const horseTotal = horseTotals[horse.id] || 0;
                   const percentage =
@@ -383,27 +388,30 @@ export default function HorseRacingBetting() {
 
           <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Your Bets</CardTitle>
+              <CardTitle>Tus Apuestas</CardTitle>
             </CardHeader>
             <CardContent>
               {userBets.length > 0 ? (
                 <ul className="space-y-2">
                   {userBets.map((bet) => {
                     const horseName =
-                      horses.find((h) => h.id === bet.horse)?.name || "Unknown";
+                      horses.find((h) => h.id === bet.horse)?.name ||
+                      "Desconocido";
 
                     return (
                       <li key={bet.id} className="text-sm border-b pb-2">
                         <div className="flex justify-between">
                           <span>{horseName}</span>
-                          <span className="font-bold">{bet.amount} coins</span>
+                          <span className="font-bold">
+                            {bet.amount} monedas
+                          </span>
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          Status: {bet.status}
+                          Estado: {bet.status}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          Potential Winnings:{" "}
-                          {calculatePotentialWinnings(bet).toFixed(2)} coins
+                          Ganancias Potenciales:{" "}
+                          {calculatePotentialWinnings(bet).toFixed(2)} monedas
                         </div>
                       </li>
                     );
@@ -411,14 +419,14 @@ export default function HorseRacingBetting() {
                 </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  You haven't placed any bets yet
+                  Aún no has realizado ninguna apuesta
                 </p>
               )}
               {userBets.length > 0 && (
                 <div className="mt-4">
                   <div className="font-bold">
-                    Total Potential Winnings:{" "}
-                    {totalPotentialWinnings.toFixed(2)} coins
+                    Ganancias Potenciales Totales:{" "}
+                    {totalPotentialWinnings.toFixed(2)} monedas
                   </div>
                 </div>
               )}

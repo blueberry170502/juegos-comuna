@@ -79,7 +79,7 @@ export default function GameEmbed({
     fetchBets();
 
     // Configuramos un intervalo para actualizar las apuestas cada 30 segundos
-    const intervalId = setInterval(fetchBets, 30000);
+    const intervalId = setInterval(fetchBets, 10000);
 
     return () => clearInterval(intervalId);
   }, [user, title, totalBets]);
@@ -105,8 +105,8 @@ export default function GameEmbed({
               <Coins className="h-4 w-4 mr-1" />
               <span>
                 {loading
-                  ? "Loading..."
-                  : `Current Pot: ${actualTotalBets} coins`}
+                  ? "Cargando..."
+                  : `Bote actual: ${actualTotalBets} monedas`}
               </span>
             </div>
           </div>
@@ -125,8 +125,8 @@ export default function GameEmbed({
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             {userBet > 0
-              ? `Your bet: ${userBet} coins`
-              : "You haven't placed a bet yet"}
+              ? `Tu apuesta: ${userBet} monedas`
+              : "Aún no has realizado una apuesta"}
           </p>
         </CardFooter>
       </Card>

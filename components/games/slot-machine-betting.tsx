@@ -451,9 +451,9 @@ export default function SlotMachineBetting() {
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Slot Machine</CardTitle>
+              <CardTitle>Máquina Tragaperras</CardTitle>
               <CardDescription>
-                Spin the reels and try your luck!
+                ¡Gira los carretes y prueba tu suerte!
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -484,7 +484,7 @@ export default function SlotMachineBetting() {
                 {/* Controles de apuesta */}
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="space-y-2">
-                    <Label className="text-white">Bet Per Line</Label>
+                    <Label className="text-white">Apuesta por Línea</Label>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
@@ -509,7 +509,7 @@ export default function SlotMachineBetting() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">Lines</Label>
+                    <Label className="text-white">Líneas</Label>
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="outline"
@@ -534,15 +534,15 @@ export default function SlotMachineBetting() {
                   </div>
                 </div>
 
-                {/* Total bet y botones */}
+                {/* Apuesta total y botones */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-white">
-                    <span className="text-gray-400">Total Bet:</span> {totalBet}{" "}
-                    coins
+                    <span className="text-gray-400">Apuesta Total:</span>{" "}
+                    {totalBet} monedas
                   </div>
                   <div className="text-white">
-                    <span className="text-gray-400">Win:</span> {winAmount}{" "}
-                    coins
+                    <span className="text-gray-400">Ganancia:</span> {winAmount}{" "}
+                    monedas
                   </div>
                 </div>
 
@@ -554,7 +554,7 @@ export default function SlotMachineBetting() {
                     }
                     className="flex-1 bg-green-600 hover:bg-green-700"
                   >
-                    {spinning ? "Spinning..." : "Spin"}
+                    {spinning ? "Girando..." : "Girar"}
                   </Button>
                   <Button
                     onClick={betMax}
@@ -564,7 +564,7 @@ export default function SlotMachineBetting() {
                     }
                     variant="outline"
                   >
-                    Bet Max
+                    Apuesta Máxima
                   </Button>
                   <Button
                     onClick={() =>
@@ -573,7 +573,7 @@ export default function SlotMachineBetting() {
                     disabled={spinning && !autoPlay}
                     variant={autoPlay ? "destructive" : "secondary"}
                   >
-                    {autoPlay ? "Stop Auto" : "Auto Play"}
+                    {autoPlay ? "Detener Auto" : "Auto Play"}
                   </Button>
                 </div>
               </div>
@@ -585,12 +585,16 @@ export default function SlotMachineBetting() {
                   onClick={() => setShowPaytable(!showPaytable)}
                   className="w-full"
                 >
-                  {showPaytable ? "Hide Paytable" : "Show Paytable"}
+                  {showPaytable
+                    ? "Ocultar Tabla de Pagos"
+                    : "Mostrar Tabla de Pagos"}
                 </Button>
 
                 {showPaytable && (
                   <div className="mt-4 border rounded-md p-4">
-                    <h3 className="font-bold mb-2">Paytable (Multipliers)</h3>
+                    <h3 className="font-bold mb-2">
+                      Tabla de Pagos (Multiplicadores)
+                    </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {PAYTABLE.slice(0, 8).map((entry, index) => (
                         <div
@@ -608,7 +612,7 @@ export default function SlotMachineBetting() {
                     </div>
 
                     <h4 className="font-bold mt-4 mb-2">
-                      Special Combinations
+                      Combinaciones Especiales
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       {PAYTABLE.slice(8).map((entry, index) => (
@@ -620,7 +624,7 @@ export default function SlotMachineBetting() {
                             {entry.symbols.map((symbol, i) => (
                               <span key={i}>
                                 {symbol === "any"
-                                  ? "Any"
+                                  ? "Cualquiera"
                                   : renderSymbol(symbol)}
                               </span>
                             ))}
@@ -630,7 +634,7 @@ export default function SlotMachineBetting() {
                       ))}
                     </div>
 
-                    <h4 className="font-bold mt-4 mb-2">Paylines</h4>
+                    <h4 className="font-bold mt-4 mb-2">Líneas de Pago</h4>
                     <div className="grid grid-cols-1 gap-2">
                       {PAYLINES.map((line, index) => (
                         <div
@@ -663,9 +667,9 @@ export default function SlotMachineBetting() {
             </CardContent>
             <CardFooter>
               <p className="text-sm text-muted-foreground">
-                Your balance:{" "}
+                Tu saldo:{" "}
                 <span className="font-bold">{userData?.balance || 0}</span>{" "}
-                coins
+                monedas
               </p>
             </CardFooter>
           </Card>
@@ -674,8 +678,10 @@ export default function SlotMachineBetting() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Your Bets</CardTitle>
-              <CardDescription>Recent slot machine bets</CardDescription>
+              <CardTitle>Tus Apuestas</CardTitle>
+              <CardDescription>
+                Apuestas recientes en la máquina tragaperras
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {userBets.length > 0 ? (
@@ -690,16 +696,16 @@ export default function SlotMachineBetting() {
                               : "text-red-600 font-medium"
                           }
                         >
-                          {bet.status === "won" ? "Win" : "Loss"}
+                          {bet.status === "won" ? "Ganado" : "Perdido"}
                         </span>
-                        <span className="font-bold">{bet.amount} coins</span>
+                        <span className="font-bold">{bet.amount} monedas</span>
                       </div>
                       <div className="text-sm text-muted-foreground mt-1">
-                        Bet: {bet.betPerLine} x {bet.linesPlayed} lines
+                        Apuesta: {bet.betPerLine} x {bet.linesPlayed} líneas
                       </div>
                       {bet.winAmount && bet.winAmount > 0 && (
                         <div className="text-sm text-green-600 mt-1">
-                          Won: {bet.winAmount} coins
+                          Ganado: {bet.winAmount} monedas
                         </div>
                       )}
                       <div className="text-xs text-muted-foreground mt-1">
@@ -707,14 +713,14 @@ export default function SlotMachineBetting() {
                           ? new Date(
                               bet.timestamp.seconds * 1000
                             ).toLocaleString()
-                          : "Just now"}
+                          : "Justo ahora"}
                       </div>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  You haven't placed any bets yet
+                  Aún no has realizado ninguna apuesta
                 </p>
               )}
             </CardContent>
