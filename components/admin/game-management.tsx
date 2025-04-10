@@ -564,23 +564,23 @@ export default function GameManagement() {
   return (
     <Tabs defaultValue="roulette">
       <TabsList className="grid grid-cols-4 mb-8">
-        <TabsTrigger value="roulette">Roulette</TabsTrigger>
+        <TabsTrigger value="roulette">Ruleta</TabsTrigger>
         <TabsTrigger value="blackjack">Blackjack</TabsTrigger>
-        <TabsTrigger value="poker">Poker</TabsTrigger>
-        <TabsTrigger value="horse-racing">Horse Racing</TabsTrigger>
+        <TabsTrigger value="poker">Póker</TabsTrigger>
+        <TabsTrigger value="horse-racing">Carreras de Caballos</TabsTrigger>
       </TabsList>
 
       <TabsContent value="roulette">
         <Card>
           <CardHeader>
-            <CardTitle>Roulette Results</CardTitle>
+            <CardTitle>Resultados de la Ruleta</CardTitle>
             <CardDescription>
-              Enter the winning number and process results
+              Ingresa el número ganador y procesa los resultados
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="rouletteResult">Winning Number (0-36)</Label>
+              <Label htmlFor="rouletteResult">Número Ganador (0-36)</Label>
               <Input
                 id="rouletteResult"
                 type="number"
@@ -588,28 +588,28 @@ export default function GameManagement() {
                 max="36"
                 value={rouletteResult}
                 onChange={(e) => setRouletteResult(e.target.value)}
-                placeholder="Enter winning number"
+                placeholder="Ingresa el número ganador"
               />
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-medium">Current Bets</h3>
+              <h3 className="text-sm font-medium">Apuestas Actuales</h3>
               {rouletteBets.length > 0 ? (
                 <div className="border rounded-md overflow-hidden">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-muted">
                       <tr>
                         <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Player
+                          Jugador
                         </th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Bet Type
+                          Tipo de Apuesta
                         </th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Bet Value
+                          Valor de Apuesta
                         </th>
                         <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Amount
+                          Monto
                         </th>
                       </tr>
                     </thead>
@@ -634,7 +634,9 @@ export default function GameManagement() {
                   </table>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No pending bets</p>
+                <p className="text-sm text-muted-foreground">
+                  No hay apuestas pendientes
+                </p>
               )}
             </div>
           </CardContent>
@@ -643,7 +645,7 @@ export default function GameManagement() {
               onClick={handleRouletteResult}
               disabled={loading || !rouletteResult || rouletteBets.length === 0}
             >
-              Process Results
+              Procesar Resultados
             </Button>
           </CardFooter>
         </Card>
@@ -652,9 +654,9 @@ export default function GameManagement() {
       <TabsContent value="blackjack">
         <Card>
           <CardHeader>
-            <CardTitle>Blackjack Results</CardTitle>
+            <CardTitle>Resultados de Blackjack</CardTitle>
             <CardDescription>
-              Select the winners and process results
+              Selecciona los ganadores y procesa los resultados
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -662,7 +664,7 @@ export default function GameManagement() {
               <div className="flex items-center justify-between mb-4 p-3 border rounded-md bg-muted/50">
                 <div className="flex items-center space-x-2">
                   <Label htmlFor="dealer-wins" className="font-medium">
-                    Dealer Wins (House Wins)
+                    Gana el Crupier (Casa Gana)
                   </Label>
                   <Switch
                     id="dealer-wins"
@@ -672,12 +674,12 @@ export default function GameManagement() {
                 </div>
                 {dealerWins && (
                   <div className="text-sm text-muted-foreground">
-                    All players will lose their bets
+                    Todos los jugadores perderán sus apuestas
                   </div>
                 )}
               </div>
 
-              <h3 className="text-sm font-medium">Select Winners</h3>
+              <h3 className="text-sm font-medium">Seleccionar Ganadores</h3>
               {blackjackBets.length > 0 ? (
                 <div className="space-y-2">
                   {Array.from(
@@ -719,14 +721,18 @@ export default function GameManagement() {
                               {bet.username}
                             </span>
                           </div>
-                          <span className="font-bold">{bet.amount} coins</span>
+                          <span className="font-bold">
+                            {bet.amount} monedas
+                          </span>
                         </div>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No pending bets</p>
+                <p className="text-sm text-muted-foreground">
+                  No hay apuestas pendientes
+                </p>
               )}
             </div>
           </CardContent>
@@ -739,7 +745,7 @@ export default function GameManagement() {
                 blackjackBets.length === 0
               }
             >
-              Process Results
+              Procesar Resultados
             </Button>
           </CardFooter>
         </Card>
@@ -748,14 +754,14 @@ export default function GameManagement() {
       <TabsContent value="poker">
         <Card>
           <CardHeader>
-            <CardTitle>Poker Results</CardTitle>
+            <CardTitle>Resultados de Póker</CardTitle>
             <CardDescription>
-              Select the winners and process results
+              Selecciona los ganadores y procesa los resultados
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <h3 className="text-sm font-medium">Select Winners</h3>
+              <h3 className="text-sm font-medium">Seleccionar Ganadores</h3>
               {pokerBets.length > 0 ? (
                 <div className="space-y-2">
                   {Array.from(new Set(pokerBets.map((bet) => bet.userId))).map(
@@ -791,7 +797,7 @@ export default function GameManagement() {
                               </span>
                             </div>
                             <span className="font-bold">
-                              {bet.amount} coins
+                              {bet.amount} monedas
                             </span>
                           </div>
                         </div>
@@ -800,7 +806,9 @@ export default function GameManagement() {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No pending bets</p>
+                <p className="text-sm text-muted-foreground">
+                  No hay apuestas pendientes
+                </p>
               )}
             </div>
           </CardContent>
@@ -811,7 +819,7 @@ export default function GameManagement() {
                 loading || pokerWinners.length === 0 || pokerBets.length === 0
               }
             >
-              Process Results
+              Procesar Resultados
             </Button>
           </CardFooter>
         </Card>
@@ -820,14 +828,14 @@ export default function GameManagement() {
       <TabsContent value="horse-racing">
         <Card>
           <CardHeader>
-            <CardTitle>Horse Racing Results</CardTitle>
+            <CardTitle>Resultados de Carreras de Caballos</CardTitle>
             <CardDescription>
-              Select the winning horse and process results
+              Selecciona el caballo ganador y procesa los resultados
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label>Winning Horse</Label>
+              <Label>Caballo Ganador</Label>
               <RadioGroup value={winningHorse} onValueChange={setWinningHorse}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {horses.map((horse) => (
@@ -849,7 +857,7 @@ export default function GameManagement() {
                         >
                           <div className="font-medium">{horse.name}</div>
                           <div className="text-xs text-muted-foreground mt-1">
-                            Bets:{" "}
+                            Apuestas:{" "}
                             {
                               horseRacingBets.filter(
                                 (bet) => bet.horse === horse.id
@@ -865,20 +873,20 @@ export default function GameManagement() {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-medium">Current Bets</h3>
+              <h3 className="text-sm font-medium">Apuestas Actuales</h3>
               {horseRacingBets.length > 0 ? (
                 <div className="border rounded-md overflow-hidden">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-muted">
                       <tr>
                         <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Player
+                          Jugador
                         </th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Horse
+                          Caballo
                         </th>
                         <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Amount
+                          Monto
                         </th>
                       </tr>
                     </thead>
@@ -890,7 +898,7 @@ export default function GameManagement() {
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap text-sm">
                             {horses.find((h) => h.id === bet.horse)?.name ||
-                              "Unknown"}
+                              "Desconocido"}
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap text-sm text-right">
                             {bet.amount}
@@ -901,7 +909,9 @@ export default function GameManagement() {
                   </table>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No pending bets</p>
+                <p className="text-sm text-muted-foreground">
+                  No hay apuestas pendientes
+                </p>
               )}
             </div>
           </CardContent>
@@ -912,7 +922,7 @@ export default function GameManagement() {
                 loading || !winningHorse || horseRacingBets.length === 0
               }
             >
-              Process Results
+              Procesar Resultados
             </Button>
           </CardFooter>
         </Card>
