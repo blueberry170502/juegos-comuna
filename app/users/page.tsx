@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import AuthCheck from "@/components/auth-check";
 import UsersList from "@/components/users-list";
-import AdminCheck from "@/components/admin-check";
 import LoadingSpinner from "@/components/loading-spinner";
 
 export default function UsersPage() {
