@@ -1,0 +1,577 @@
+.roulette-felt {
+  background-color: #006633; /* Verde intenso de casino */
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M25.5 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zM16 4.5c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm18 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm-27 9c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm-36 9c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm18 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm-45 9c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm-36 9c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm9 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z' fill='%23005529' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+  border-radius: 8px;
+  position: relative;
+  padding: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* DISEÑO PARA PC */
+.roulette-table {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Estructura principal de la mesa */
+.table-container {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+}
+
+/* Estilos para los números 0 y 00 */
+.zeros-section {
+  display: flex;
+  flex-direction: column;
+  width: 60px;
+}
+
+.zero-cell {
+  background-color: #006633;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 60px;
+  width: 100%;
+}
+
+.zero-cell:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.double-zero-cell {
+  background-color: #006633;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 60px;
+  width: 100%;
+}
+
+.double-zero-cell:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para los números 1-36 */
+.numbers-section {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px;
+}
+
+.number-cell {
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  height: 60px;
+}
+
+.number-cell:hover {
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.number-cell.red {
+  background-color: #e62e2e;
+}
+
+.number-cell.black {
+  background-color: #000000;
+}
+
+/* Estilos para las apuestas de columna */
+.column-bets {
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px;
+}
+
+.column-bet {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: #006633;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: white;
+  height: 60px;
+  width: 60px;
+}
+
+.column-bet:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para las apuestas de docena */
+.dozen-bets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 1px;
+}
+
+.dozen-bet {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: #006633;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: white;
+}
+
+/* Ajuste para que cada docena ocupe el mismo ancho que sus números correspondientes */
+.dozen-bet:nth-child(1) {
+  grid-column: span 4;
+}
+
+.dozen-bet:nth-child(2) {
+  grid-column: span 4;
+}
+
+.dozen-bet:nth-child(3) {
+  grid-column: span 4;
+}
+
+/* Estilos para las apuestas externas */
+.outside-bets {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  margin-top: 1px;
+}
+
+.outside-bet {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: #006633;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: white;
+}
+
+.outside-bet:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.outside-bet.red-diamond {
+  position: relative;
+}
+
+.outside-bet.red-diamond::after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: #e62e2e;
+  transform: rotate(45deg);
+}
+
+.outside-bet.black-diamond {
+  position: relative;
+}
+
+.outside-bet.black-diamond::after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: #000000;
+  transform: rotate(45deg);
+}
+
+/* Nuevo estilo para la mesa principal */
+.main-table-container {
+  display: flex;
+}
+
+/* DISEÑO PARA MÓVIL */
+/* Estructura principal de la mesa - Versión móvil vertical */
+.roulette-table-mobile {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Sección de ceros */
+.zeros-section-mobile {
+  display: flex;
+  width: 100%;
+  height: 3rem;
+}
+
+.zero-cell-mobile {
+  background-color: #006633;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex: 1;
+  height: 100%;
+}
+
+.zero-cell-mobile:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Contenedor principal para números y docenas en móvil */
+.numbers-and-dozens-mobile {
+  display: flex;
+  width: 100%;
+}
+
+/* Sección de números */
+.numbers-section-mobile {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(3rem, auto);
+  gap: 1px;
+  flex: 3;
+}
+
+.number-cell-mobile {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  aspect-ratio: 1;
+}
+
+.number-cell-mobile:hover {
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.number-cell-mobile.red {
+  background-color: #e62e2e;
+}
+
+.number-cell-mobile.black {
+  background-color: #000000;
+}
+
+/* Sección de docenas (a la derecha) */
+.dozens-section-mobile {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.dozen-bet-mobile {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: #006633;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: white;
+  font-size: 0.8rem;
+  flex: 1;
+}
+
+.dozen-bet-mobile:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sección de columnas (abajo) */
+.column-bets-mobile {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  width: 100%;
+  height: 2.5rem;
+}
+
+.column-bet-mobile {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: #006633;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: white;
+  font-size: 0.8rem;
+}
+
+.column-bet-mobile:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Apuestas externas */
+.outside-bets-mobile {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  width: 100%;
+}
+
+.outside-bet-mobile {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: #006633;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: white;
+  font-size: 0.8rem;
+}
+
+.outside-bet-mobile:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.outside-bet-mobile.red-diamond {
+  position: relative;
+}
+
+.outside-bet-mobile.red-diamond::after {
+  content: "";
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #e62e2e;
+  transform: rotate(45deg);
+}
+
+.outside-bet-mobile.black-diamond {
+  position: relative;
+}
+
+.outside-bet-mobile.black-diamond::after {
+  content: "";
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #000000;
+  transform: rotate(45deg);
+}
+
+/* Estilos para las fichas */
+.chip {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  border: 2px dashed white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.chip-value {
+  position: relative;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  padding: 2px 4px;
+  font-weight: bold;
+  font-size: 0.6rem;
+  color: #ffeb3b; /* Color amarillo para mejor contraste */
+}
+
+/* Estilos para los selectores de fichas */
+.betting-controls {
+  background-color: #1a3c28;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.betting-controls-mobile {
+  background-color: #1a3c28;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chip-selector {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.chip-selector.selected {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.chip-5 {
+  background-color: #ff5252;
+}
+
+.chip-10 {
+  background-color: #2196f3;
+}
+
+.chip-25 {
+  background-color: #4caf50;
+}
+
+.chip-50 {
+  background-color: #ff9800;
+}
+
+.chip-100 {
+  background-color: #9c27b0;
+}
+
+.table-label {
+  font-family: Arial, sans-serif;
+  color: #ffd700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+/* Estilos para las fichas de otros jugadores */
+.other-player-chip {
+  position: absolute;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  border: 2px dashed white;
+  z-index: 5;
+}
+
+.other-player-chip .chip-value {
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  padding: 1px 3px;
+  color: #ffeb3b;
+}
+
+/* Leyenda de apuestas */
+.bet-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.legend-color {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+}
+
+/* Contenedor de resumen de apuestas para móvil */
+.bet-summary-mobile {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  color: white;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+  
+  .roulette-felt {
+    padding: 5px;
+  }
+  
+  .chip {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+  
+  .chip-value {
+    font-size: 0.5rem;
+    padding: 1px 2px;
+  }
+  
+  .chip-selector {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-view {
+    display: block;
+  }
+  
+  .mobile-view {
+    display: none;
+  }
+}

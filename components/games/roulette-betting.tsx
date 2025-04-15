@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/firebase-hooks";
 import { db } from "@/lib/firebase-config";
 import {
@@ -33,7 +33,8 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Coins } from "lucide-react";
-import { useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import InteractiveRouletteTable from "./interactive-roulette-table";
 
 type BetType =
   | "number"
@@ -378,154 +379,176 @@ export default function RouletteBetting() {
 
   return (
     <div className="space-y-8">
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Realiza tu Apuesta</CardTitle>
-              <CardDescription>
-                Elige el tipo de apuesta, cantidad y valor
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="betType">Tipo de Apuesta</Label>
-                <Select
-                  value={betType}
-                  onValueChange={(value) => {
-                    setBetType(value as BetType);
-                    setBetValue("");
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el tipo de apuesta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="number">Número Directo</SelectItem>
-                    <SelectItem value="color">Color (Rojo/Negro)</SelectItem>
-                    <SelectItem value="section">
-                      Sección (1-12, 13-24, 25-36)
-                    </SelectItem>
-                    <SelectItem value="dozen">
-                      Docena (1-12, 13-24, 25-36)
-                    </SelectItem>
-                    <SelectItem value="column">
-                      Columna (1ra, 2da, 3ra)
-                    </SelectItem>
-                    <SelectItem value="evenOdd">Par/Impar</SelectItem>
-                    <SelectItem value="highLow">
-                      Alto/Bajo (1-18, 19-36)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+      <Tabs defaultValue="interactive">
+        <TabsList className="w-full">
+          <TabsTrigger value="interactive" className="flex-1">
+            Mesa Interactiva
+          </TabsTrigger>
+          <TabsTrigger value="classic" className="flex-1">
+            Modo Clásico
+          </TabsTrigger>
+        </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="betValue">Valor de la Apuesta</Label>
-                <div className="max-h-48 overflow-y-auto p-2 border rounded-md">
-                  {renderBetOptions()}
-                </div>
-              </div>
+        <TabsContent value="interactive" className="pt-6">
+          <InteractiveRouletteTable />
+        </TabsContent>
 
-              <div className="space-y-2">
-                <Label htmlFor="amount">Cantidad de la Apuesta</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="amount"
-                    type="number"
-                    min="1"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Ingresa la cantidad"
-                  />
-                  <Button
-                    onClick={handleBet}
-                    disabled={loading || !betValue || !amount}
-                  >
-                    Realizar Apuesta
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <p className="text-sm text-muted-foreground">
-                Tu saldo:{" "}
-                <span className="font-bold">{userData?.balance || 0}</span>{" "}
-                monedas
-              </p>
-            </CardFooter>
-          </Card>
-        </div>
+        <TabsContent value="classic" className="pt-6">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Realiza tu Apuesta</CardTitle>
+                  <CardDescription>
+                    Elige el tipo de apuesta, cantidad y valor
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="betType">Tipo de Apuesta</Label>
+                    <Select
+                      value={betType}
+                      onValueChange={(value) => {
+                        setBetType(value as BetType);
+                        setBetValue("");
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona el tipo de apuesta" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="number">Número Directo</SelectItem>
+                        <SelectItem value="color">
+                          Color (Rojo/Negro)
+                        </SelectItem>
+                        <SelectItem value="section">
+                          Sección (1-12, 13-24, 25-36)
+                        </SelectItem>
+                        <SelectItem value="dozen">
+                          Docena (1-12, 13-24, 25-36)
+                        </SelectItem>
+                        <SelectItem value="column">
+                          Columna (1ra, 2da, 3ra)
+                        </SelectItem>
+                        <SelectItem value="evenOdd">Par/Impar</SelectItem>
+                        <SelectItem value="highLow">
+                          Alto/Bajo (1-18, 19-36)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Estadísticas de la Ruleta</CardTitle>
-              <CardDescription>
-                Apuestas actuales y tamaño del bote
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Bote Total:</span>
-                <span className="font-bold flex items-center">
-                  <Coins className="h-4 w-4 mr-1" />
-                  {totalPot} monedas
-                </span>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="betValue">Valor de la Apuesta</Label>
+                    <div className="max-h-48 overflow-y-auto p-2 border rounded-md">
+                      {renderBetOptions()}
+                    </div>
+                  </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Tus Apuestas:</span>
-                <span className="font-bold flex items-center">
-                  <Coins className="h-4 w-4 mr-1" />
-                  {userBets.reduce((sum, bet) => sum + bet.amount, 0)} monedas
-                </span>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="amount">Cantidad de la Apuesta</Label>
+                    <div className="flex space-x-2">
+                      <Input
+                        id="amount"
+                        type="number"
+                        min="1"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="Ingresa la cantidad"
+                      />
+                      <Button
+                        onClick={handleBet}
+                        disabled={loading || !betValue || !amount}
+                      >
+                        Realizar Apuesta
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <p className="text-sm text-muted-foreground">
+                    Tu saldo:{" "}
+                    <span className="font-bold">{userData?.balance || 0}</span>{" "}
+                    monedas
+                  </p>
+                </CardFooter>
+              </Card>
+            </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Ganancias Potenciales:</span>
-                <span className="font-bold flex items-center text-green-600">
-                  <Coins className="h-4 w-4 mr-1" />
-                  {totalPotentialWinnings} monedas
-                </span>
-              </div>
+            <div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Estadísticas de la Ruleta</CardTitle>
+                  <CardDescription>
+                    Apuestas actuales y tamaño del bote
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Bote Total:</span>
+                    <span className="font-bold flex items-center">
+                      <Coins className="h-4 w-4 mr-1" />
+                      {totalPot} monedas
+                    </span>
+                  </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Jugadores Totales:</span>
-                <span className="font-bold">
-                  {new Set(allBets.map((bet) => bet.userId)).size}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Tus Apuestas:</span>
+                    <span className="font-bold flex items-center">
+                      <Coins className="h-4 w-4 mr-1" />
+                      {userBets.reduce((sum, bet) => sum + bet.amount, 0)}{" "}
+                      monedas
+                    </span>
+                  </div>
 
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle>Tus Apuestas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {userBets.length > 0 ? (
-                <ul className="space-y-2">
-                  {userBets.map((bet) => (
-                    <li key={bet.id} className="text-sm border-b pb-2">
-                      <div className="flex justify-between">
-                        <span>
-                          {bet.betType}: {bet.betValue}
-                        </span>
-                        <span className="font-bold">{bet.amount} monedas</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Aún no has realizado ninguna apuesta
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Ganancias Potenciales:</span>
+                    <span className="font-bold flex items-center text-green-600">
+                      <Coins className="h-4 w-4 mr-1" />
+                      {totalPotentialWinnings} monedas
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Jugadores Totales:</span>
+                    <span className="font-bold">
+                      {new Set(allBets.map((bet) => bet.userId)).size}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="mt-4">
+                <CardHeader>
+                  <CardTitle>Tus Apuestas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {userBets.length > 0 ? (
+                    <ul className="space-y-2">
+                      {userBets.map((bet) => (
+                        <li key={bet.id} className="text-sm border-b pb-2">
+                          <div className="flex justify-between">
+                            <span>
+                              {bet.betType}: {bet.betValue}
+                            </span>
+                            <span className="font-bold">
+                              {bet.amount} monedas
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Aún no has realizado ninguna apuesta
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
