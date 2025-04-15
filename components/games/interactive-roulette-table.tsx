@@ -1370,6 +1370,46 @@ export default function InteractiveRouletteTable() {
         ) : (
           <p className="text-gray-400 text-sm">No hay apuestas pendientes</p>
         )}
+        {/* Other Players */}
+        <div className="bet-summary p-4 text-white mt-4">
+          <h3 className="text-lg font-semibold mb-4 table-label">
+            OTROS JUGADORES
+          </h3>
+
+          {allUserBets.length > 0 ? (
+            <div className="space-y-2">
+              {allUserBets.map((userBet) => (
+                <div key={userBet.userId} className="p-2 bg-gray-800 rounded">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: userBet.color }}
+                    ></div>
+                    <span>{userBet.username}</span>
+                    <span className="text-gray-400 text-sm ml-auto">
+                      {userBet.bets.reduce((sum, bet) => sum + bet.amount, 0)}{" "}
+                      monedas
+                    </span>
+                  </div>
+                  {userBet.bets.length > 0 && (
+                    <div className="pl-6 text-sm text-gray-300 space-y-1">
+                      {userBet.bets.map((bet, index) => (
+                        <div key={index} className="flex justify-between">
+                          <span>{getBetDescription(bet)}</span>
+                          <span>{bet.amount} monedas</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-sm">
+              No hay otros jugadores apostando
+            </p>
+          )}
+        </div>
       </div>
     );
   };
@@ -1514,6 +1554,46 @@ export default function InteractiveRouletteTable() {
         ) : (
           <p className="text-gray-400 text-sm">No hay apuestas pendientes</p>
         )}
+        {/* Other Players */}
+        <div className="bet-summary p-4 text-white mt-4">
+          <h3 className="text-lg font-semibold mb-4 table-label">
+            OTROS JUGADORES
+          </h3>
+
+          {allUserBets.length > 0 ? (
+            <div className="space-y-2">
+              {allUserBets.map((userBet) => (
+                <div key={userBet.userId} className="p-2 bg-gray-800 rounded">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: userBet.color }}
+                    ></div>
+                    <span>{userBet.username}</span>
+                    <span className="text-gray-400 text-sm ml-auto">
+                      {userBet.bets.reduce((sum, bet) => sum + bet.amount, 0)}{" "}
+                      monedas
+                    </span>
+                  </div>
+                  {userBet.bets.length > 0 && (
+                    <div className="pl-6 text-sm text-gray-300 space-y-1">
+                      {userBet.bets.map((bet, index) => (
+                        <div key={index} className="flex justify-between">
+                          <span>{getBetDescription(bet)}</span>
+                          <span>{bet.amount} monedas</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-sm">
+              No hay otros jugadores apostando
+            </p>
+          )}
+        </div>
       </div>
     );
   };
