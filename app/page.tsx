@@ -1,9 +1,15 @@
-import { Suspense } from "react";
+import type { Metadata } from "next";
+import GameEmbed from "@/components/game-embed";
 import AuthCheck from "@/components/auth-check";
+import { Suspense } from "react";
 import LoginForm from "@/components/login-form";
 import LoadingSpinner from "@/components/loading-spinner";
-import GameEmbed from "@/components/game-embed";
 import { Coins } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Juegos Comuna",
+  description: "Plataforma de juegos para eventos",
+};
 
 export default function HomePage() {
   return (
@@ -49,7 +55,7 @@ export default function HomePage() {
           <h2 className="text-2xl font-semibold mt-12 mb-6">
             Juegos de Casino
           </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <GameEmbed
               title="Ruleta"
               description="Haz tus apuestas en números, colores o secciones"
@@ -79,6 +85,14 @@ export default function HomePage() {
               description="Apuesta por tu caballo favorito para ganar la carrera"
               image="/caballos-foto.png"
               href="/games/horse-racing"
+              totalBets={0}
+            />
+
+            <GameEmbed
+              title="Higher or Lower"
+              description="Adivina si algo es más famoso que otra cosa"
+              image="/casino-foto.png"
+              href="/games/higher-lower"
               totalBets={0}
             />
           </div>

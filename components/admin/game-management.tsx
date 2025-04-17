@@ -39,6 +39,10 @@ interface Bet {
   betType?: string;
   betValue?: string;
   horse?: string;
+  difficulty?: string;
+  multiplier?: number;
+  currentRound?: number;
+  isActive?: boolean;
   timestamp: any;
   status: "pending" | "won" | "lost";
 }
@@ -63,12 +67,16 @@ export default function GameManagement() {
   const [blackjackBets, setBlackjackBets] = useState<Bet[]>([]);
   const [pokerBets, setPokerBets] = useState<Bet[]>([]);
   const [horseRacingBets, setHorseRacingBets] = useState<Bet[]>([]);
+  const [higherLowerBets, setHigherLowerBets] = useState<Bet[]>([]);
 
   const [rouletteResult, setRouletteResult] = useState("");
   const [blackjackWinners, setBlackjackWinners] = useState<string[]>([]);
   const [dealerWins, setDealerWins] = useState(false);
   const [pokerWinners, setPokerWinners] = useState<string[]>([]);
   const [winningHorse, setWinningHorse] = useState("");
+  const [higherLowerAction, setHigherLowerAction] = useState<
+    "correct" | "incorrect" | "cashout"
+  >("correct");
 
   useEffect(() => {
     const fetchBets = async () => {
@@ -134,6 +142,22 @@ export default function GameManagement() {
           horseRacingBetsList.push(betData);
         });
         setHorseRacingBets(horseRacingBetsList);
+
+        // Fetch higher-lower bets
+        const higherLowerQuery = query(
+          collection(db, "bets"),
+          where("game", "==", "higher-lower"),
+          where("status", "==", "pending"),
+          where("isActive", "==", true)
+        );
+        const higherLowerSnapshot = await getDocs(higherLowerQuery);
+        const higherLowerBetsList: Bet[] = [];
+        higherLowerSnapshot.forEach((doc) => {
+          const betData = doc.data() as Bet;
+          betData.id = doc.id;
+          higherLowerBetsList.push(betData);
+        });
+        setHigherLowerBets(higherLowerBetsList);
       } catch (error) {
         console.error("Error fetching bets:", error);
         toast({
@@ -534,6 +558,100 @@ export default function GameManagement() {
     }
   };
 
+  const handleHigherLowerResults = async (betId: string) => {
+    setLoading(true);
+
+    try {
+      const batch = writeBatch(db);
+      const bet = higherLowerBets.find((b) => b.id === betId);
+
+      if (!bet) {
+        throw new Error("Bet not found");
+      }
+
+      const betRef = doc(db, "bets", betId);
+      const userRef = doc(db, "users", bet.userId);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
+
+      if (!userData) {
+        throw new Error("User data not found");
+      }
+
+      if (higherLowerAction === "correct") {
+        // El jugador acertó, actualizar la ronda y continuar
+        const newRound = (bet.currentRound || 1) + 1;
+        batch.update(betRef, {
+          currentRound: newRound,
+        });
+
+        // Actualizar el estado local en lugar de eliminar la apuesta
+        setHigherLowerBets(
+          higherLowerBets.map((b) =>
+            b.id === betId ? { ...b, currentRound: newRound } : b
+          )
+        );
+
+        toast({
+          title: "Predicción correcta",
+          description: `El jugador avanza a la ronda ${newRound}`,
+        });
+      } else if (higherLowerAction === "incorrect") {
+        // El jugador falló, pierde la apuesta
+        batch.update(betRef, {
+          status: "lost",
+          isActive: false,
+          resolvedAt: serverTimestamp(),
+        });
+
+        // Eliminar la apuesta del estado local
+        setHigherLowerBets(higherLowerBets.filter((b) => b.id !== betId));
+
+        toast({
+          title: "Predicción incorrecta",
+          description: "El jugador ha perdido su apuesta",
+        });
+      } else if (higherLowerAction === "cashout") {
+        // El jugador se retira, calcular ganancias
+        const multiplier = bet.multiplier || 1;
+        const rounds = bet.currentRound || 1;
+
+        // Calcular ganancias: apuesta inicial * (multiplicador ^ (rondas - 1))
+        const winnings = bet.amount * Math.pow(multiplier, rounds - 1);
+
+        batch.update(betRef, {
+          status: "won",
+          isActive: false,
+          resolvedAt: serverTimestamp(),
+        });
+
+        batch.update(userRef, {
+          balance: userData.balance + winnings,
+        });
+
+        // Eliminar la apuesta del estado local
+        setHigherLowerBets(higherLowerBets.filter((b) => b.id !== betId));
+
+        toast({
+          title: "Jugador se retira",
+          description: `Ganancias: ${winnings.toFixed(0)} monedas`,
+        });
+      }
+
+      // Commit all updates
+      await batch.commit();
+    } catch (error) {
+      console.error("Error processing higher-lower results:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process higher-lower results",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const toggleBlackjackWinner = (userId: string) => {
     // Si el crupier gana, no permitimos seleccionar ganadores
     if (dealerWins) return;
@@ -563,11 +681,12 @@ export default function GameManagement() {
 
   return (
     <Tabs defaultValue="roulette">
-      <TabsList className="grid grid-cols-4 mb-8">
+      <TabsList className="grid grid-cols-5 mb-8">
         <TabsTrigger value="roulette">Ruleta</TabsTrigger>
         <TabsTrigger value="blackjack">Blackjack</TabsTrigger>
         <TabsTrigger value="poker">Póker</TabsTrigger>
         <TabsTrigger value="horse-racing">Carreras de Caballos</TabsTrigger>
+        <TabsTrigger value="higher-lower">Higher or Lower</TabsTrigger>
       </TabsList>
 
       <TabsContent value="roulette">
@@ -925,6 +1044,117 @@ export default function GameManagement() {
               Procesar Resultados
             </Button>
           </CardFooter>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="higher-lower">
+        <Card>
+          <CardHeader>
+            <CardTitle>Resultados de Higher or Lower</CardTitle>
+            <CardDescription>
+              Evalúa las predicciones de los jugadores
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {higherLowerBets.length > 0 ? (
+              <div className="space-y-4">
+                {higherLowerBets.map((bet) => (
+                  <Card key={bet.id} className="border-2 border-muted">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg">
+                          {bet.username}
+                        </CardTitle>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
+                            Ronda:{" "}
+                            <span className="font-bold">
+                              {bet.currentRound || 1}
+                            </span>
+                          </span>
+                          <span className="px-2 py-1 bg-primary/20 text-primary dark:bg-primary/30 dark:text-primary-foreground rounded-md text-xs font-medium">
+                            Multiplicador: x{bet.multiplier || 1.5}
+                          </span>
+                        </div>
+                      </div>
+                      <CardDescription>
+                        Apuesta inicial:{" "}
+                        <span className="font-semibold text-black dark:text-white">
+                          {bet.amount} monedas
+                        </span>{" "}
+                        | Ganancias potenciales:{" "}
+                        <span className="font-semibold text-green-600 dark:text-green-400">
+                          {(
+                            bet.amount *
+                            Math.pow(
+                              bet.multiplier || 1.5,
+                              (bet.currentRound || 1) - 1
+                            )
+                          ).toFixed(0)}{" "}
+                          monedas
+                        </span>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="space-y-2">
+                        <Label>Resultado de la predicción</Label>
+                        <RadioGroup
+                          value={higherLowerAction}
+                          onValueChange={(value) =>
+                            setHigherLowerAction(
+                              value as "correct" | "incorrect" | "cashout"
+                            )
+                          }
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="correct"
+                              id={`correct-${bet.id}`}
+                            />
+                            <Label htmlFor={`correct-${bet.id}`}>
+                              Predicción correcta (continuar)
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="incorrect"
+                              id={`incorrect-${bet.id}`}
+                            />
+                            <Label htmlFor={`incorrect-${bet.id}`}>
+                              Predicción incorrecta (pierde)
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="cashout"
+                              id={`cashout-${bet.id}`}
+                            />
+                            <Label htmlFor={`cashout-${bet.id}`}>
+                              Jugador se retira (cobra ganancias)
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button
+                        onClick={() => handleHigherLowerResults(bet.id)}
+                        disabled={loading}
+                        className="w-full"
+                      >
+                        Procesar Resultado
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No hay apuestas pendientes
+              </p>
+            )}
+          </CardContent>
         </Card>
       </TabsContent>
     </Tabs>

@@ -16,6 +16,15 @@ import {
 } from "@/components/ui/card";
 import { Coins } from "lucide-react";
 
+// Mover gameNameMap fuera del componente para evitar que cambie en cada renderizado
+const gameNameMap = {
+  Ruleta: "roulette",
+  Blackjack: "blackjack",
+  Póker: "poker",
+  "Carreras de Caballos": "horse-racing",
+  "Higher or Lower": "higher-lower",
+};
+
 interface GameEmbedProps {
   title: string;
   description: string;
@@ -31,23 +40,31 @@ export default function GameEmbed({
   href,
   totalBets,
 }: GameEmbedProps) {
-  const { user, userData } = useAuth();
+  const { user } = useAuth();
   const [userBet, setUserBet] = useState(0);
   const [actualTotalBets, setActualTotalBets] = useState(0); // Inicializamos en 0 en lugar de usar totalBets
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
     const fetchBets = async () => {
       if (!user) return;
 
       try {
         setLoading(true);
 
+        // Normalizar el nombre del juego para la consulta
+        const gameName =
+          gameNameMap[title as keyof typeof gameNameMap] || title.toLowerCase();
+
+        console.log(`Consultando apuestas para: ${gameName}`);
+
         // Obtener SOLO apuestas PENDIENTES del juego actual
         const betsRef = collection(db, "bets");
         const q = query(
           betsRef,
-          where("game", "==", title.toLowerCase()),
+          where("game", "==", gameName),
           where("status", "==", "pending")
         );
         const querySnapshot = await getDocs(q);
@@ -55,21 +72,34 @@ export default function GameEmbed({
         let total = 0;
         let userBetAmount = 0;
 
+        console.log(`Número de apuestas encontradas: ${querySnapshot.size}`);
+
         querySnapshot.forEach((doc) => {
           const betData = doc.data();
-          total += betData.amount;
+          const betAmount =
+            typeof betData.amount === "number"
+              ? betData.amount
+              : Number(betData.amount) || 0;
+
+          console.log(
+            `Apuesta ID: ${doc.id}, Monto: ${betAmount}, Usuario: ${betData.userId}`
+          );
+
+          total += betAmount;
 
           if (betData.userId === user.uid) {
-            userBetAmount += betData.amount;
+            userBetAmount += betAmount;
           }
         });
 
-        // Actualizamos con el total real de apuestas pendientes
         setActualTotalBets(total);
         setUserBet(userBetAmount);
+
+        console.log(
+          `Juego: ${title}, Total apuestas: ${total}, Apuesta usuario: ${userBetAmount}`
+        );
       } catch (error) {
-        console.error("Error fetching bets:", error);
-        // Si hay un error, usamos el valor de fallback
+        console.error(`Error fetching bets for ${title}:`, error);
         setActualTotalBets(totalBets);
       } finally {
         setLoading(false);
@@ -78,11 +108,18 @@ export default function GameEmbed({
 
     fetchBets();
 
-    // Configuramos un intervalo para actualizar las apuestas cada 30 segundos
-    const intervalId = setInterval(fetchBets, 10000);
+    // Configurar el intervalo para actualizar las apuestas cada 30 segundos
+    intervalId = setInterval(fetchBets, 30000);
 
-    return () => clearInterval(intervalId);
+    // Limpiar el intervalo cuando el componente se desmonte o cambien las dependencias
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [user, title, totalBets]);
+
+  // Calcular el porcentaje de la apuesta del usuario
+  const userBetPercentage =
+    actualTotalBets > 0 ? Math.min((userBet / actualTotalBets) * 100, 100) : 0;
 
   return (
     <Link href={href}>
@@ -101,9 +138,9 @@ export default function GameEmbed({
         </CardHeader>
         <CardContent className="pb-2">
           <div className="flex justify-between items-center">
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Coins className="h-4 w-4 mr-1" />
-              <span>
+            <div className="flex items-center text-sm font-medium">
+              <Coins className="h-4 w-4 mr-1 text-primary" />
+              <span className="text-black dark:text-white">
                 {loading
                   ? "Cargando..."
                   : `Bote actual: ${actualTotalBets} monedas`}
@@ -111,21 +148,22 @@ export default function GameEmbed({
             </div>
           </div>
         </CardContent>
-        <CardFooter>
-          <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
+        <CardFooter className="flex flex-col items-start w-full">
+          <div className="w-full bg-muted h-3 rounded-full overflow-hidden mb-2">
             <div
-              className="bg-primary h-full"
-              style={{
-                width:
-                  userBet > 0 && actualTotalBets > 0
-                    ? `${Math.min((userBet / actualTotalBets) * 100, 100)}%`
-                    : "0%",
-              }}
+              className="bg-primary h-full transition-all duration-500 ease-in-out"
+              style={{ width: `${userBetPercentage}%` }}
             ></div>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p
+            className={`text-sm ${
+              userBet > 0 ? "text-primary font-medium" : "text-muted-foreground"
+            }`}
+          >
             {userBet > 0
-              ? `Tu apuesta: ${userBet} monedas`
+              ? `Tu apuesta: ${userBet} monedas (${userBetPercentage.toFixed(
+                  1
+                )}%)`
               : "Aún no has realizado una apuesta"}
           </p>
         </CardFooter>

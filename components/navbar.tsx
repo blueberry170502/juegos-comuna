@@ -85,6 +85,11 @@ export default function Navbar() {
       label: "Máquina Tragamonedas",
       icon: <Gamepad className="h-4 w-4 mr-2" />,
     },
+    {
+      href: "/games/higher-lower",
+      label: "Higher or Lower",
+      icon: <Gamepad className="h-4 w-4 mr-2" />,
+    },
   ];
 
   // Elementos de navegación solo para administradores
