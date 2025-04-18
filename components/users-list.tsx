@@ -576,13 +576,6 @@ export default function ListaDeUsuarios() {
           <h2 className="text-xl font-semibold">
             Usuarios ({usuarios.length})
           </h2>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.location.reload()}
-          >
-            Refrescar
-          </Button>
         </div>
         <Tabs defaultValue="ranking">
           <TabsList className="grid w-full grid-cols-3">
@@ -730,13 +723,6 @@ export default function ListaDeUsuarios() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Usuarios ({usuarios.length})</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => window.location.reload()}
-        >
-          Refrescar
-        </Button>
       </div>
 
       <Tabs defaultValue="usuarios">
