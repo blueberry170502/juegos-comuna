@@ -5,7 +5,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
 import { FirebaseProvider } from "@/lib/firebase-provider";
-import DebugHelper from "@/lib/debug-helper";
+import { PhotoChallengeProvider } from "@/lib/photo-challenge-provider";
+import PhotoChallengeModal from "@/components/photo-challenge-modal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,10 +25,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <FirebaseProvider>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <div className="flex-1">{children}</div>
-            </div>
+            <PhotoChallengeProvider>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <div className="flex-1">{children}</div>
+                <PhotoChallengeModal />
+              </div>
+            </PhotoChallengeProvider>
           </FirebaseProvider>
         </ThemeProvider>
       </body>

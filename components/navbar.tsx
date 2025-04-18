@@ -12,6 +12,7 @@ import {
   Gamepad,
   Coins,
   Menu,
+  Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/firebase-hooks";
@@ -55,6 +56,11 @@ export default function Navbar() {
       href: "/challenges",
       label: "Desafíos",
       icon: <User className="h-4 w-4 mr-2" />,
+    },
+    {
+      href: "/fotos",
+      label: "Fotos",
+      icon: <Camera className="h-4 w-4 mr-2" />,
     },
   ];
 
