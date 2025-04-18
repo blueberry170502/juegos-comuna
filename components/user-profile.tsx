@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoadingSpinner from "@/components/loading-spinner";
+import { ShieldCheck } from "lucide-react";
 
 export default function UserProfile() {
   const { userData, loading, user } = useAuth();
@@ -65,14 +66,22 @@ export default function UserProfile() {
                 {userData.balance} monedas
               </p>
             </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Bloqueadores</p>
+              <p className="text-xl font-bold flex items-center">
+                <ShieldCheck className="h-4 w-4 mr-1 text-blue-500" />
+                {userData.blockers?.length || 0}
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Tabs defaultValue="purchases">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="purchases">Historial de Compras</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="purchases">Compras</TabsTrigger>
           <TabsTrigger value="challenges">Desafíos</TabsTrigger>
+          <TabsTrigger value="blockers">Bloqueadores</TabsTrigger>
         </TabsList>
         <TabsContent value="purchases" className="mt-4">
           <Card>
@@ -85,7 +94,7 @@ export default function UserProfile() {
             <CardContent>
               {userData.purchases && userData.purchases.length > 0 ? (
                 <ul className="space-y-2">
-                  {userData.purchases.map((purchase, index) => (
+                  {userData.purchases.map((purchase: any, index: any) => (
                     <li
                       key={index}
                       className="flex justify-between items-center border-b pb-2"
@@ -116,7 +125,7 @@ export default function UserProfile() {
             <CardContent>
               {userData.challenges && userData.challenges.length > 0 ? (
                 <ul className="space-y-4">
-                  {userData.challenges.map((challenge, index) => (
+                  {userData.challenges.map((challenge: any, index: any) => (
                     <li key={index} className="border rounded-md p-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-medium">
@@ -128,17 +137,29 @@ export default function UserProfile() {
                               ? "outline"
                               : "default"
                           }
+                          className={
+                            challenge.blocked
+                              ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                              : challenge.status === "completed"
+                              ? "bg-green-500/10 text-green-500 border-green-500/20"
+                              : challenge.status === "failed"
+                              ? "bg-red-500/10 text-red-500 border-red-500/20"
+                              : "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+                          }
                         >
-                          {challenge.status === "pending"
-                            ? "pendiente"
-                            : challenge.status}
+                          {challenge.blocked ? "bloqueado" : challenge.status}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {challenge.isReceived ? "De" : "Para"}:{" "}
                         {challenge.otherUsername}
                       </p>
-                      {challenge.timeRemaining && (
+                      {challenge.challengeDescription && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {challenge.challengeDescription}
+                        </p>
+                      )}
+                      {challenge.timeRemaining && !challenge.blocked && (
                         <p className="text-sm font-medium mt-2">
                           Tiempo restante: {challenge.timeRemaining}
                         </p>
@@ -148,6 +169,40 @@ export default function UserProfile() {
                 </ul>
               ) : (
                 <p className="text-muted-foreground">Aún no tienes desafíos</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="blockers" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tus Bloqueadores</CardTitle>
+              <CardDescription>
+                Bloqueadores de desafíos que has adquirido
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {userData.blockers && userData.blockers.length > 0 ? (
+                <ul className="space-y-2">
+                  {userData.blockers.map((blocker: any, index: any) => (
+                    <li
+                      key={index}
+                      className="flex justify-between items-center border-b pb-2"
+                    >
+                      <div className="flex items-center">
+                        <ShieldCheck className="h-4 w-4 mr-2 text-blue-500" />
+                        <span>{blocker.itemName}</span>
+                      </div>
+                      <span className="text-muted-foreground">
+                        {blocker.price} monedas
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted-foreground">
+                  No tienes bloqueadores disponibles
+                </p>
               )}
             </CardContent>
           </Card>

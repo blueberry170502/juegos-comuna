@@ -22,7 +22,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Minus, XCircle, CheckCircle } from "lucide-react";
+import {
+  Plus,
+  Minus,
+  XCircle,
+  CheckCircle,
+  Trophy,
+  Coins,
+  Package,
+} from "lucide-react";
 import LoadingSpinner from "@/components/loading-spinner";
 import { useAuth } from "@/lib/firebase-hooks";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,6 +42,7 @@ interface User {
   balance: number;
   isAdmin: boolean;
   challenges: Challenge[];
+  purchases?: Purchase[];
 }
 
 interface Challenge {
@@ -47,6 +56,26 @@ interface Challenge {
   value: number;
 }
 
+interface Purchase {
+  itemId: string;
+  itemName: string;
+  price: number;
+  purchasedAt: string;
+  type?: string;
+}
+
+interface UserScore {
+  userId: string;
+  username: string;
+  totalScore: number;
+  coinScore: number;
+  challengeScore: number;
+  itemScore: number;
+  coins: number;
+  completedChallenges: number;
+  regularItems: number;
+}
+
 export default function ListaDeUsuarios() {
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -56,8 +85,14 @@ export default function ListaDeUsuarios() {
   const [retosDeUsuarios, setRetosDeUsuarios] = useState<
     Record<string, Challenge[]>
   >({});
+  const [userScores, setUserScores] = useState<UserScore[]>([]);
   const { toast } = useToast();
   const { userData } = useAuth();
+
+  // Multiplicadores para el ranking global
+  const COIN_MULTIPLIER = 0.5;
+  const ITEM_MULTIPLIER = 1;
+  const CHALLENGE_MULTIPLIER = 4;
 
   useEffect(() => {
     const obtenerUsuarios = async () => {
@@ -88,6 +123,7 @@ export default function ListaDeUsuarios() {
             balance: data.balance || 0,
             isAdmin: data.isAdmin || false,
             challenges: data.challenges || [],
+            purchases: data.purchases || [],
           };
         });
 
@@ -105,6 +141,39 @@ export default function ListaDeUsuarios() {
             return acc;
           }, {} as Record<string, Challenge[]>)
         );
+
+        // Calcular puntuaciones para el ranking global
+        const scores = listaUsuarios.map((usuario) => {
+          const completedChallenges =
+            usuario.challenges?.filter(
+              (reto: { status: string; isReceived: boolean }) =>
+                reto.status === "completed" && reto.isReceived === true
+            ).length || 0;
+
+          const regularItems =
+            usuario.purchases?.filter(
+              (purchase: { type: string }) =>
+                !purchase.type || purchase.type === "regular"
+            ).length || 0;
+
+          const coinScore = usuario.balance * COIN_MULTIPLIER;
+          const challengeScore = completedChallenges * CHALLENGE_MULTIPLIER;
+          const itemScore = regularItems * ITEM_MULTIPLIER;
+
+          return {
+            userId: usuario.id,
+            username: usuario.username,
+            totalScore: coinScore + challengeScore + itemScore,
+            coinScore,
+            challengeScore,
+            itemScore,
+            coins: usuario.balance,
+            completedChallenges,
+            regularItems,
+          };
+        });
+
+        setUserScores(scores);
 
         // Inicializar objeto de cantidades
         const cantidadesIniciales: Record<string, number> = {};
@@ -178,6 +247,24 @@ export default function ListaDeUsuarios() {
         }),
       });
 
+      // Actualizar puntuaciones
+      setUserScores((prevScores) => {
+        return prevScores.map((score) => {
+          if (score.userId === idUsuario) {
+            const newCompletedChallenges = score.completedChallenges + 1;
+            const newChallengeScore =
+              newCompletedChallenges * CHALLENGE_MULTIPLIER;
+            return {
+              ...score,
+              completedChallenges: newCompletedChallenges,
+              challengeScore: newChallengeScore,
+              totalScore: score.coinScore + newChallengeScore + score.itemScore,
+            };
+          }
+          return score;
+        });
+      });
+
       toast({
         title: "¡Reto completado!",
         description: "Has completado el reto exitosamente.",
@@ -217,6 +304,24 @@ export default function ListaDeUsuarios() {
 
         await updateDoc(referenciaUsuario, {
           balance: usuario.balance - reto.value,
+        });
+
+        // Actualizar puntuaciones
+        setUserScores((prevScores) => {
+          return prevScores.map((score) => {
+            if (score.userId === idUsuario) {
+              const newCoins = score.coins - reto.value;
+              const newCoinScore = newCoins * COIN_MULTIPLIER;
+              return {
+                ...score,
+                coins: newCoins,
+                coinScore: newCoinScore,
+                totalScore:
+                  newCoinScore + score.challengeScore + score.itemScore,
+              };
+            }
+            return score;
+          });
         });
       }
 
@@ -316,6 +421,23 @@ export default function ListaDeUsuarios() {
         [idUsuario]: prev[idUsuario] + cantidades[idUsuario],
       }));
 
+      // Actualizar puntuaciones
+      setUserScores((prevScores) => {
+        return prevScores.map((score) => {
+          if (score.userId === idUsuario) {
+            const newCoins = score.coins + cantidades[idUsuario];
+            const newCoinScore = newCoins * COIN_MULTIPLIER;
+            return {
+              ...score,
+              coins: newCoins,
+              coinScore: newCoinScore,
+              totalScore: newCoinScore + score.challengeScore + score.itemScore,
+            };
+          }
+          return score;
+        });
+      });
+
       toast({
         title: "Fondos agregados",
         description: `Se agregaron ${cantidades[idUsuario]} monedas al saldo de ${usuario.username}`,
@@ -378,6 +500,23 @@ export default function ListaDeUsuarios() {
         ...prev,
         [idUsuario]: prev[idUsuario] - cantidades[idUsuario],
       }));
+
+      // Actualizar puntuaciones
+      setUserScores((prevScores) => {
+        return prevScores.map((score) => {
+          if (score.userId === idUsuario) {
+            const newCoins = score.coins - cantidades[idUsuario];
+            const newCoinScore = newCoins * COIN_MULTIPLIER;
+            return {
+              ...score,
+              coins: newCoins,
+              coinScore: newCoinScore,
+              totalScore: newCoinScore + score.challengeScore + score.itemScore,
+            };
+          }
+          return score;
+        });
+      });
 
       toast({
         title: "Fondos removidos",
@@ -445,11 +584,66 @@ export default function ListaDeUsuarios() {
             Refrescar
           </Button>
         </div>
-        <Tabs defaultValue="dinero">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="ranking">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="ranking">Ranking Global</TabsTrigger>
             <TabsTrigger value="dinero">Dinero</TabsTrigger>
             <TabsTrigger value="retos">Retos</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="ranking" className="mt-4">
+            {userScores
+              .sort((a, b) => b.totalScore - a.totalScore)
+              .map((score, i) => (
+                <Card key={score.userId} className="mb-4">
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>
+                        {i === 0 && "🏆 "}
+                        {i === 1 && "🥈 "}
+                        {i === 2 && "🥉 "}
+                        {score.username}
+                      </span>
+                      <span className="text-primary font-bold">
+                        {Math.round(score.totalScore)} pts
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="flex flex-col items-center p-2 bg-muted rounded-md">
+                        <Coins className="h-5 w-5 mb-1 text-yellow-500" />
+                        <p className="text-sm font-medium">
+                          {Math.round(score.coinScore)} pts
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {score.coins} monedas
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-center p-2 bg-muted rounded-md">
+                        <Trophy className="h-5 w-5 mb-1 text-purple-500" />
+                        <p className="text-sm font-medium">
+                          {Math.round(score.challengeScore)} pts
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {score.completedChallenges} retos
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-center p-2 bg-muted rounded-md">
+                        <Package className="h-5 w-5 mb-1 text-blue-500" />
+                        <p className="text-sm font-medium">
+                          {Math.round(score.itemScore)} pts
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {score.regularItems} objetos
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+          </TabsContent>
+
           <TabsContent value="dinero" className="mt-4">
             {usuarios
               .sort((a, b) => b.balance - a.balance)
@@ -545,99 +739,175 @@ export default function ListaDeUsuarios() {
         </Button>
       </div>
 
-      {usuarios.map((usuario) => (
-        <Card key={usuario.id}>
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <span>{usuario.username}</span>
-              <span className="text-primary">{saldos[usuario.id]} monedas</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              {usuario.email}
-            </p>
-            <div className="flex items-center space-x-4">
-              <div className="flex-1">
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="Cantidad"
-                  value={cantidades[usuario.id] || ""}
-                  onChange={(e) =>
-                    manejarCambioCantidad(usuario.id, e.target.value)
-                  }
-                />
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => manejarAgregarFondos(usuario.id)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => manejarRemoverFondos(usuario.id)}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="mt-4 flex-col"></div>
-          </CardContent>
-          <CardFooter className="flex-col items-start space-y-4">
-            <CardTitle>
-              <span>Retos pendientes</span>
-            </CardTitle>
-            {(() => {
-              const retosPendientes = retosDeUsuarios[usuario.id].filter(
-                (c) => c.isReceived === true && c.status === "pending"
-              );
+      <Tabs defaultValue="usuarios">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="usuarios">Gestión de Usuarios</TabsTrigger>
+          <TabsTrigger value="ranking">Ranking Global</TabsTrigger>
+        </TabsList>
 
-              if (retosPendientes.length === 0) {
-                return (
-                  <p className="text-muted-foreground">
-                    No hay retos pendientes
-                  </p>
-                );
-              }
-
-              return (
-                <div className="space-y-2">
-                  {retosPendientes.map((reto) => (
-                    <div
-                      key={reto.challengeId}
-                      className="flex justify-between items-center"
-                    >
-                      <span>{reto.challengeName}</span>
-                      <div>
-                        <Button
-                          variant="outline"
-                          onClick={() =>
-                            manejarRetoFallido(reto.challengeId, usuario.id)
-                          }
-                        >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Fallar
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            manejarCompletarReto(reto.challengeId, usuario.id)
-                          }
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Completar
-                        </Button>
-                      </div>
+        <TabsContent value="ranking" className="mt-4">
+          {userScores
+            .sort((a, b) => b.totalScore - a.totalScore)
+            .map((score, i) => (
+              <Card key={score.userId} className="mb-4">
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    <span>
+                      {i === 0 && "🏆 "}
+                      {i === 1 && "🥈 "}
+                      {i === 2 && "🥉 "}
+                      {score.username}
+                    </span>
+                    <span className="text-primary font-bold">
+                      {Math.round(score.totalScore)} pts
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-center p-2 bg-muted rounded-md">
+                      <Coins className="h-5 w-5 mb-1 text-yellow-500" />
+                      <p className="text-sm font-medium">
+                        {Math.round(score.coinScore)} pts
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {score.coins} monedas
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        x{COIN_MULTIPLIER}
+                      </p>
                     </div>
-                  ))}
+                    <div className="flex flex-col items-center p-2 bg-muted rounded-md">
+                      <Trophy className="h-5 w-5 mb-1 text-purple-500" />
+                      <p className="text-sm font-medium">
+                        {Math.round(score.challengeScore)} pts
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {score.completedChallenges} retos
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        x{CHALLENGE_MULTIPLIER}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-muted rounded-md">
+                      <Package className="h-5 w-5 mb-1 text-blue-500" />
+                      <p className="text-sm font-medium">
+                        {Math.round(score.itemScore)} pts
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {score.regularItems} objetos
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        x{ITEM_MULTIPLIER}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+        </TabsContent>
+
+        <TabsContent value="usuarios" className="mt-4">
+          {usuarios.map((usuario) => (
+            <Card key={usuario.id}>
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  <span>{usuario.username}</span>
+                  <span className="text-primary">
+                    {saldos[usuario.id]} monedas
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {usuario.email}
+                </p>
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1">
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="Cantidad"
+                      value={cantidades[usuario.id] || ""}
+                      onChange={(e) =>
+                        manejarCambioCantidad(usuario.id, e.target.value)
+                      }
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => manejarAgregarFondos(usuario.id)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => manejarRemoverFondos(usuario.id)}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
                 </div>
-              );
-            })()}
-          </CardFooter>
-        </Card>
-      ))}
+                <div className="mt-4 flex-col"></div>
+              </CardContent>
+              <CardFooter className="flex-col items-start space-y-4">
+                <CardTitle>
+                  <span>Retos pendientes</span>
+                </CardTitle>
+                {(() => {
+                  const retosPendientes = retosDeUsuarios[usuario.id].filter(
+                    (c) => c.isReceived === true && c.status === "pending"
+                  );
+
+                  if (retosPendientes.length === 0) {
+                    return (
+                      <p className="text-muted-foreground">
+                        No hay retos pendientes
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-2">
+                      {retosPendientes.map((reto) => (
+                        <div
+                          key={reto.challengeId}
+                          className="flex justify-between items-center"
+                        >
+                          <span>{reto.challengeName}</span>
+                          <div>
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                manejarRetoFallido(reto.challengeId, usuario.id)
+                              }
+                            >
+                              <XCircle className="h-4 w-4 mr-2" />
+                              Fallar
+                            </Button>
+                            <Button
+                              onClick={() =>
+                                manejarCompletarReto(
+                                  reto.challengeId,
+                                  usuario.id
+                                )
+                              }
+                            >
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Completar
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </CardFooter>
+            </Card>
+          ))}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
