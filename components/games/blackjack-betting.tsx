@@ -203,7 +203,10 @@ export default function BlackjackBetting() {
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="Ingresa la cantidad"
                   />
-                  <Button onClick={handleBet} disabled={loading || !amount}>
+                  <Button
+                    onClick={handleBet}
+                    disabled={loading || !amount || userBets.length > 0}
+                  >
                     Apostar
                   </Button>
                 </div>

@@ -39,10 +39,10 @@ interface HorseRacingBet {
 }
 
 const horses = [
-  { id: "1", name: "Thunder Bolt" },
-  { id: "2", name: "Silver Arrow" },
-  { id: "3", name: "Golden Star" },
-  { id: "4", name: "Midnight Runner" },
+  { id: "1", name: "Caballo Espadas ⚔️" },
+  { id: "2", name: "Caballo Monedas 🪙" },
+  { id: "3", name: "Caballo Copas 🏆" },
+  { id: "4", name: "Caballo Bastos 🦯" },
 ];
 
 export default function HorseRacingBetting() {
@@ -102,23 +102,12 @@ export default function HorseRacingBetting() {
     fetchBets();
   }, [user]);
 
-  // Añadir función para calcular el beneficio potencial
+  // Función para calcular el beneficio potencial
   const calculatePotentialWinnings = (bet: HorseRacingBet): number => {
-    if (!bet.horse) return 0;
-
-    const totalBetOnHorse = horseTotals[bet.horse] || 0;
-
-    // Si no hay apuestas en este caballo, no hay ganancia estimada
-    if (totalBetOnHorse === 0) return 0;
-
-    // Calculamos la proporción de la apuesta del usuario respecto al total apostado en ese caballo
-    const userProportion = bet.amount / totalBetOnHorse;
-
-    // La ganancia potencial es la proporción del usuario multiplicada por el bote total
-    return totalPot * userProportion;
+    return bet.amount * 4; // Ganancias = lo apostado * 4
   };
 
-  // Añadir el cálculo del beneficio total potencial
+  // Cálculo del beneficio total potencial
   const totalPotentialWinnings = userBets.reduce(
     (sum, bet) => sum + calculatePotentialWinnings(bet),
     0
@@ -366,11 +355,7 @@ export default function HorseRacingBetting() {
                   Probabilidades por Caballo
                 </h3>
                 {horses.map((horse) => {
-                  const horseTotal = horseTotals[horse.id] || 0;
-                  const percentage =
-                    totalPot > 0 ? (horseTotal / totalPot) * 100 : 0;
-                  const odds =
-                    percentage > 0 ? (100 / percentage).toFixed(2) : "N/A";
+                  const odds = 4;
 
                   return (
                     <div
@@ -411,7 +396,7 @@ export default function HorseRacingBetting() {
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           Ganancias Potenciales:{" "}
-                          {calculatePotentialWinnings(bet).toFixed(2)} monedas
+                          {calculatePotentialWinnings(bet).toFixed(0)} monedas
                         </div>
                       </li>
                     );
@@ -426,7 +411,7 @@ export default function HorseRacingBetting() {
                 <div className="mt-4">
                   <div className="font-bold">
                     Ganancias Potenciales Totales:{" "}
-                    {totalPotentialWinnings.toFixed(2)} monedas
+                    {totalPotentialWinnings.toFixed(0)} monedas
                   </div>
                 </div>
               )}

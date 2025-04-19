@@ -343,7 +343,14 @@ export default function ChallengesList() {
 
   const blockedChallenges =
     userData.challenges?.filter(
-      (c: { blocked: boolean }) => c.blocked === true
+      (c: { status: string; isReceived: boolean }) => {
+        if (selectedFilter === "Recieved") {
+          return c.status === "blocked" && c.isReceived === true;
+        } else if (selectedFilter === "Sent") {
+          return c.status === "blocked" && c.isReceived === false;
+        }
+        return false;
+      }
     ) || [];
 
   const completedChallenges =

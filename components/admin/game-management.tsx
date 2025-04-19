@@ -53,10 +53,10 @@ interface User {
 }
 
 const horses = [
-  { id: "1", name: "Thunder Bolt" },
-  { id: "2", name: "Silver Arrow" },
-  { id: "3", name: "Golden Star" },
-  { id: "4", name: "Midnight Runner" },
+  { id: "1", name: "Caballo Espadas ⚔️" },
+  { id: "2", name: "Caballo Monedas 🪙" },
+  { id: "3", name: "Caballo Copas 🏆" },
+  { id: "4", name: "Caballo Bastos 🦯" },
 ];
 
 export default function GameManagement() {
@@ -517,9 +517,7 @@ export default function GameManagement() {
         if (won) {
           const userRef = doc(db, "users", bet.userId);
 
-          // Calculate winnings proportional to bet amount
-          const winningRatio = bet.amount / totalWinningBets;
-          const winnings = totalPot * winningRatio;
+          const winnings = bet.amount * 4;
 
           // We need to get the current balance first
           const userDoc = await getDoc(doc(db, "users", bet.userId));
