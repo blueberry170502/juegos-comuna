@@ -91,7 +91,7 @@ export default function HomePage() {
             <GameEmbed
               title="Higher or Lower"
               description="Adivina si algo es más famoso que otra cosa"
-              image="/casino-foto.png"
+              image="/higher-lower.png"
               href="/games/higher-lower"
               totalBets={0}
             />
